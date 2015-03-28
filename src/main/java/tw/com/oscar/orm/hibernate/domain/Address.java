@@ -1,24 +1,20 @@
 /**
- *
  * Title: Acer Internal Project
  * Copyright: (c) 2015, Acer Inc.
  * Name: Address
  *
  * @author Oscar Wei
  * @since 2015/3/13
- *
+ * <p>
  * H i s t o r y
- *
+ * <p>
  * 2015/3/13 Oscar Wei v1
- * + File created 
+ * + File created
  */
 package tw.com.oscar.orm.hibernate.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.persistence.Embeddable;
+import java.io.Serializable;
 
 /**
  * <strong>Description:</strong><br>
@@ -28,9 +24,8 @@ import javax.validation.constraints.Size;
  * @version v1, 2015/3/13
  * @since 2015/3/13
  */
-@Entity
-@Table(name = "ADDRESS")
-public class Address extends BaseEntity {
+@Embeddable
+public class Address implements Serializable {
 
     private String city;
     private String street;
@@ -39,9 +34,6 @@ public class Address extends BaseEntity {
     public Address() {
     }
 
-    @NotNull
-    @Column(name = "CITY", nullable = false)
-    @Size(max = 20)
     public String getCity() {
         return city;
     }
@@ -50,8 +42,6 @@ public class Address extends BaseEntity {
         this.city = city;
     }
 
-    @Size(max = 100)
-    @Column(name = "STREET")
     public String getStreet() {
         return street;
     }
@@ -60,8 +50,6 @@ public class Address extends BaseEntity {
         this.street = street;
     }
 
-    @Size(max = 5)
-    @Column(name = "ZIP_CODE")
     public String getZipCode() {
         return zipCode;
     }
@@ -79,10 +67,8 @@ public class Address extends BaseEntity {
 
         if (city != null ? !city.equals(address.city) : address.city != null) return false;
         if (street != null ? !street.equals(address.street) : address.street != null) return false;
-        if (zipCode != null ? !zipCode.equals(address.zipCode) : address.zipCode != null)
-            return false;
+        return !(zipCode != null ? !zipCode.equals(address.zipCode) : address.zipCode != null);
 
-        return true;
     }
 
     @Override

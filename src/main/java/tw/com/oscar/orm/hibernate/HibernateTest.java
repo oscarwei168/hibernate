@@ -14,10 +14,7 @@
 package tw.com.oscar.orm.hibernate;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.*;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -45,6 +42,7 @@ import java.util.List;
 public class HibernateTest {
 
     private static final Logger LOGGER = Logger.getLogger(HibernateTest.class);
+    private static final String ADMIN = "DTS.Admin";
 
     public static void main(String[] args) {
 
@@ -54,72 +52,120 @@ public class HibernateTest {
             statistics.setStatisticsEnabled(true);
             statistics.clear();
 
+            StatelessSession statelessSession = HibernateUtil.getSessionFactory()
+                    .openStatelessSession();
+
             Session session = HibernateUtil.getSessionFactory().getCurrentSession();
             Transaction tx = session.beginTransaction();
-//            Long pid = testCase1(session);
+            Long pid = testCase1(session);
             tx.commit();
             EntityStatistics roleStatic = statistics.getEntityStatistics(Role.class.getName());
             LOGGER.info("InsertCount : " + roleStatic.getInsertCount());
+            statistics.clear();
 
+            // Dynamic insert/update testing
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-//            testCase2(session, pid);
+            Role role = testCase2(session, pid);
             tx.commit();
             LOGGER.info("UpdateCount : " + roleStatic.getUpdateCount());
+            statistics.clear();
+
+            // same session cache testing
+            session = HibernateUtil.getSessionFactory().getCurrentSession();
+            HibernateUtil.getSessionFactory().getCache().evictEntity(Role.class, pid);
+            tx = session.beginTransaction();
+            session.setCacheMode(CacheMode.PUT);
+            testCache1(session, pid); // comment class-level cache setting
+            tx.commit();
+            statistics.clear();
+
+            // cross session cache testing
+            session = HibernateUtil.getSessionFactory().getCurrentSession();
+            tx = session.beginTransaction();
+//            HibernateUtil.getSessionFactory().getCache().evictEntity(Role.class, pid);
+            session.setCacheMode(CacheMode.NORMAL);
+            testCache2(session, pid); // uncomment class-level cache setting
+            tx.commit();
+            statistics.clear();
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-            CompanyId companyId = new CompanyId("EMEA", "0001");
-            Company company = (Company) session.get(Company.class, companyId);
-            System.out.println("Desc : " + company.getDescription());
+            testCache2(session, pid);
             tx.commit();
+            statistics.clear();
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-            Credit credit = createCredit(session);
+//            CompanyId companyId = new CompanyId("EMEA", "0001");
+//            Company company = (Company) session.get(Company.class, companyId);
+//            LOGGER.info("Desc : " + company.getDescription());
             tx.commit();
+            statistics.clear();
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-            testCase3(session, credit);
+//            Credit credit = createCredit(session);
             tx.commit();
+            statistics.clear();
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-            accountSummary(session);
+//            testCase3(session, credit);
             tx.commit();
+            statistics.clear();
+
+            session = HibernateUtil.getSessionFactory().getCurrentSession();
+            tx = session.beginTransaction();
+//            accountSummary(session);
+            tx.commit();
+            statistics.clear();
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
 //            formula(session);
             tx.commit();
+            statistics.clear();
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-//            testCase4(session);
+            testCase4(session);
             tx.commit();
+            statistics.clear();
 
             // Natural-Id searching example
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-            testNaturalId(session);
+//            testNaturalId(session);
             tx.commit();
+            statistics.clear();
 
             // Full-Text searching example
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-            testFullText(session);
+//            testFullText(session);
             tx.commit();
-
             statistics.clear();
+
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         } finally {
-            statistics.setStatisticsEnabled(false);
-//            HibernateUtil.getSessionFactory().close();
+            if (null != statistics) {
+                statistics.setStatisticsEnabled(false);
+            }
+            HibernateUtil.getSessionFactory().close();
             LOGGER.info("Hibernate session is closed");
         }
 
+    }
+
+    private static void testCache1(Session session, Long pid) {
+        Role role1 = (Role) session.get(Role.class, pid);
+        Role role2 = (Role) session.get(Role.class, pid);
+    }
+
+    private static void testCache2(Session session, Long pid) {
+        Role role1 = (Role) session.get(Role.class, pid);
     }
 
     /**
@@ -130,7 +176,7 @@ public class HibernateTest {
     private static Long testCase1(Session session) {
         Role role = new Role();
         role.setRoleName("ROLE_ADMIN");
-        role.setUserCreated("DTS");
+        role.setUserCreated(ADMIN);
         role.setDateCreated(new Date());
         return (Long) session.save(role);
     }
@@ -141,17 +187,32 @@ public class HibernateTest {
      * @param session a hibernate session object
      * @param rolePid a role pid
      */
-    private static void testCase2(Session session, Long rolePid) {
+    private static Role testCase2(Session session, Long rolePid) {
         Role role = (Role) session.get(Role.class, rolePid);
         role.setRoleName("ROLE_USER");
-        role.setUserCreated("OW");
-        role.setUserLastModified("OW");
+        role.setUserCreated("XXX"); // Nothing happen...
+        role.setUserLastModified(ADMIN);
         role.setDateLastModified(new Date());
-        session.save(role); // TODO merge()???
+        session.merge(role); // TODO merge()???
         // TODO Open cache/immutable annotations
+        return role;
     }
 
     private static void testCase3(Session session, Credit credit) {
+        Department it = new Department("IT");
+        it.setUserCreated(ADMIN);
+        it.setDateCreated(new Date());
+
+        Department pg = new Department("PG");
+        pg.setUserCreated(ADMIN);
+        pg.setDateCreated(new Date());
+        it.addSubDepartment(pg);
+
+        Department service = new Department("SERVICE");
+        service.setUserCreated(ADMIN);
+        service.setDateCreated(new Date());
+        it.addSubDepartment(service);
+
         Account account = new Account();
         account.setUsername("oscarwei");
         account.setPassword("12345");
@@ -159,24 +220,37 @@ public class HibernateTest {
         account.setLastName("Wei");
         account.setEmail("oscar.wei@acer.com");
         account.setSalary(new BigDecimal(1000000L));
-        account.setUserCreated("DTS");
+        account.setUserCreated(ADMIN);
         account.setDateCreated(new Date());
+
+        Address home = new Address();
+        home.setCity("Taipei");
+        home.setStreet("Xxxxx");
+        home.setZipCode("101");
+
+        Address work = new Address();
+        work.setCity("Taipei");
+        work.setStreet("Taipei 101");
+        work.setZipCode("110");
+
+        account.setHomeAddress(home);
+        account.setWorkAddress(work);
 
         Role admin = new Role();
         admin.setRoleName("ROLE_ADMIN");
-        admin.setUserCreated("DTS");
+        admin.setUserCreated(ADMIN);
         admin.setDateCreated(new Date());
 
         Role user = new Role();
         user.setRoleName("ROLE_USER");
-        user.setUserCreated("DTS");
+        user.setUserCreated(ADMIN);
         user.setDateCreated(new Date());
 
         Instant instant = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant();
         ToDo do1 = new ToDo("subject1", "Desc1", Date.from(instant));
         ToDo do2 = new ToDo("subject2", "Desc2", Date.from(instant));
-        do1.setUserCreated("DTS");
-        do2.setUserCreated("DTS");
+        do1.setUserCreated(ADMIN);
+        do2.setUserCreated(ADMIN);
         do1.setDateCreated(new Date());
         do2.setDateCreated(new Date());
         account.addToDo(do1);
@@ -186,6 +260,11 @@ public class HibernateTest {
 //        session.save(admin);
 //        session.save(user);
 
+        session.save(pg);
+        session.save(service);
+        session.save(it);
+
+        account.setDepartment(pg);
         account.setCredit(credit);
         credit.setAccount(account);
         account.addRole(admin);
@@ -204,16 +283,18 @@ public class HibernateTest {
 
         Query query = session.getNamedQuery(Role.SQL_ROLE_FIND_BY_ROLE_NAME);
         query.setParameter("roleName", "ROLE_USER");
+//        query.setCacheable(true).setCacheRegion("sampleCache1");
         Role user = (Role) query.uniqueResult();
         session.delete(user);
     }
 
     private static void testNaturalId(Session session) {
-        List<Account> accounts = session.createCriteria(Account.class)
-                .add(Restrictions.naturalId().set("username", "oscarwei")).list();
-        if (CollectionUtils.isNotEmpty(accounts)) {
-            LOGGER.info("Natural-Id searching size : " + accounts.size());
-            Account account = accounts.get(0);
+//        List<Account> accounts = session.createCriteria(Account.class)
+//                .add(Restrictions.naturalId().set("username", "oscarwei")).list();
+        NaturalIdLoadAccess naturalIdentifier = session.byNaturalId(Account.class);
+        naturalIdentifier.using("username", "oscarwei");
+        Account account = (Account) naturalIdentifier.load();
+        if (null != account) {
             LOGGER.info("Account email : " + account.getEmail());
         }
     }
@@ -239,7 +320,7 @@ public class HibernateTest {
         Credit credit = new Credit();
         credit.setName("Normal");
         credit.setDescription("A normal credit...");
-        credit.setUserCreated("DTS");
+        credit.setUserCreated(ADMIN);
         credit.setDateCreated(new Date());
         session.persist(credit);
         return credit;
@@ -248,8 +329,6 @@ public class HibernateTest {
     private static void accountSummary(Session session) {
         Query query = session.createQuery("FROM AccountSummary");
         List<AccountSummary> list = query.list();
-        for (AccountSummary summary : list) {
-            System.out.println(summary.getFirstName() + " : " + summary.getSalary());
-        }
+        list.stream().forEach(summary -> System.out.println(summary.getFirstName() + " : " + summary.getSalary()));
     }
 }

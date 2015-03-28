@@ -1,19 +1,20 @@
 /**
- *
  * Title: Acer Internal Project
  * Copyright: (c) 2015, Acer Inc.
  * Name: Role
  *
  * @author Oscar Wei
  * @since 2015/3/9
- *
+ * <p>
  * H i s t o r y
- *
+ * <p>
  * 2015/3/9 Oscar Wei v1
- * + File created 
+ * + File created
  */
 package tw.com.oscar.orm.hibernate.domain;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
@@ -31,6 +32,7 @@ import java.util.Set;
 @Entity
 @Table(name = "ROLE")
 //@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 //@Immutable
 @NamedQuery(name = Role.SQL_ROLE_FIND_BY_ROLE_NAME, query = "FROM Role r WHERE r.roleName = :roleName")
 public class Role extends BaseEntity {

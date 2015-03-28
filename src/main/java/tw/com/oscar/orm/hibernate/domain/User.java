@@ -1,21 +1,19 @@
 /**
- *
  * Title: Acer Internal Project
  * Copyright: (c) 2015, Acer Inc.
  * Name: User
  *
  * @author Oscar Wei
  * @since 2015/3/16
- *
+ * <p>
  * H i s t o r y
- *
+ * <p>
  * 2015/3/16 Oscar Wei v1
- * + File created 
+ * + File created
  */
 package tw.com.oscar.orm.hibernate.domain;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
+import javax.persistence.*;
 
 /**
  * <strong>Description:</strong><br>
@@ -43,6 +41,7 @@ public class User {
         this.pid = pid;
     }
 
+    @Column(name = "AGE")
     public int getAge() {
         return age;
     }

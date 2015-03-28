@@ -1,19 +1,20 @@
 /**
- *
  * Title: Acer Internal Project
  * Copyright: (c) 2015, Acer Inc.
  * Name: UserId
  *
  * @author Oscar Wei
  * @since 2015/3/16
- *
+ * <p>
  * H i s t o r y
- *
+ * <p>
  * 2015/3/16 Oscar Wei v1
- * + File created 
+ * + File created
  */
 package tw.com.oscar.orm.hibernate.domain;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 
@@ -26,6 +27,7 @@ import java.io.Serializable;
  * @since 2015/3/16
  */
 @Embeddable
+@Access(AccessType.PROPERTY)
 public class UserId implements Serializable {
 
     private String firstName;

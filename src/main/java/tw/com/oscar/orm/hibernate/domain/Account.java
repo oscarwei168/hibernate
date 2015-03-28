@@ -23,8 +23,8 @@ import org.hibernate.search.annotations.Parameter;
 import org.hibernate.validator.constraints.Email;
 import tw.com.oscar.orm.hibernate.domain.enums.Gender;
 
-import javax.persistence.CascadeType;
 import javax.persistence.*;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.Index;
@@ -76,10 +76,13 @@ public class Account extends VersionEntity {
     private BigDecimal yearEndBonus;
     private Byte[] photo;
 
+    private Department department; // 1:1
     private Set<String> telephones; // 1:N value types
+    private Address homeAddress; // Embedded objects
+    private Address workAddress;
     private Credit credit; // 1:1
     private Set<Role> roles = new HashSet<>(); // N:M
-    private Set<Address> addressSet; // 1:N(U)
+    // private Set<Address> addressSet; // 1:N(U)
     private List<ToDo> toDoSet = new LinkedList<>(); // 1:N(B)(INX)
 
     public Account() {
@@ -181,6 +184,17 @@ public class Account extends VersionEntity {
         this.photo = photo;
     }
 
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "PID_DEPARTMENT", foreignKey = @ForeignKey(name = "FK_ACCOUNT_DEPARTMENT"))
+    @Fetch(FetchMode.SELECT)
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
     @ElementCollection(targetClass = String.class, fetch = FetchType.LAZY)
     @CollectionTable(
             name = "TELEPHONE",
@@ -196,8 +210,37 @@ public class Account extends VersionEntity {
         this.telephones = telephones;
     }
 
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "city", column = @Column(name = "HOME_CITY")),
+            @AttributeOverride(name = "street", column = @Column(name = "HOME_STREET")),
+            @AttributeOverride(name = "zipCode", column = @Column(name = "HOME_ZIP_CODE"))
+    })
+    public Address getHomeAddress() {
+        return homeAddress;
+    }
+
+    public void setHomeAddress(Address homeAddress) {
+        this.homeAddress = homeAddress;
+    }
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "city", column = @Column(name = "WORK_CITY")),
+            @AttributeOverride(name = "street", column = @Column(name = "WORK_STREET")),
+            @AttributeOverride(name = "zipCode", column = @Column(name = "WORK_ZIP_CODE"))
+    })
+    public Address getWorkAddress() {
+        return workAddress;
+    }
+
+    public void setWorkAddress(Address workAddress) {
+        this.workAddress = workAddress;
+    }
+
     @OneToOne(cascade = CascadeType.ALL, optional = true)
-    @JoinColumn(name = "PID_CREDIT", nullable = false, updatable = false)
+    @JoinColumn(name = "PID_CREDIT", nullable = false, updatable = false,
+            foreignKey = @ForeignKey(name = "FK_ACCOUNT_CREDIT"))
     public Credit getCredit() {
         return credit;
     }
@@ -209,7 +252,7 @@ public class Account extends VersionEntity {
     @ManyToMany(mappedBy = "accounts")
     @org.hibernate.annotations.ForeignKey(name = "FK_ACCOUNT_ROLE")
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
-    @Fetch(FetchMode.SELECT)
+    @Fetch(FetchMode.JOIN)
     protected Set<Role> getRoles() {
         return roles;
     }
@@ -228,16 +271,16 @@ public class Account extends VersionEntity {
         role.getAccounts().remove(this);
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "PID_ACCOUNT")
-    @org.hibernate.annotations.ForeignKey(name = "FK_ACCOUNT_ADDRESS_PID")
-    public Set<Address> getAddressSet() {
-        return addressSet;
-    }
-
-    public void setAddressSet(Set<Address> addressSet) {
-        this.addressSet = addressSet;
-    }
+//    @OneToMany(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "PID_ACCOUNT")
+//    @org.hibernate.annotations.ForeignKey(name = "FK_ACCOUNT_ADDRESS_PID")
+//    public Set<Address> getAddressSet() {
+//        return addressSet;
+//    }
+//
+//    public void setAddressSet(Set<Address> addressSet) {
+//        this.addressSet = addressSet;
+//    }
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
 //    @OrderBy("startDate asc")
@@ -282,8 +325,8 @@ public class Account extends VersionEntity {
             return false;
         if (credit != null ? !credit.equals(account.credit) : account.credit != null) return false;
         if (roles != null ? !roles.equals(account.roles) : account.roles != null) return false;
-        if (addressSet != null ? !addressSet.equals(account.addressSet) : account.addressSet != null)
-            return false;
+//        if (addressSet != null ? !addressSet.equals(account.addressSet) : account.addressSet != null)
+//            return false;
         return !(toDoSet != null ? !toDoSet.equals(account.toDoSet) : account.toDoSet != null);
 
     }
@@ -302,7 +345,7 @@ public class Account extends VersionEntity {
         result = 31 * result + (telephones != null ? telephones.hashCode() : 0);
         result = 31 * result + (credit != null ? credit.hashCode() : 0);
         result = 31 * result + (roles != null ? roles.hashCode() : 0);
-        result = 31 * result + (addressSet != null ? addressSet.hashCode() : 0);
+//        result = 31 * result + (addressSet != null ? addressSet.hashCode() : 0);
         result = 31 * result + (toDoSet != null ? toDoSet.hashCode() : 0);
         return result;
     }

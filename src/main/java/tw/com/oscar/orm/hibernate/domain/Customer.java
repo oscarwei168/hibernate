@@ -1,16 +1,15 @@
 /**
- *
  * Title: Acer Internal Project
  * Copyright: (c) 2015, Acer Inc.
  * Name: Customer
  *
  * @author Oscar Wei
  * @since 2015/3/16
- *
+ * <p>
  * H i s t o r y
- *
+ * <p>
  * 2015/3/16 Oscar Wei v1
- * + File created 
+ * + File created
  */
 package tw.com.oscar.orm.hibernate.domain;
 
@@ -31,8 +30,9 @@ public class Customer {
     private CustomerId pid;
 
     @MapsId("userId")
-    @JoinColumns({ @JoinColumn(name = "FK_USER_FIRST_NAME", referencedColumnName = "firstName"),
-            @JoinColumn(name = "FK_USER_LAST_NAME", referencedColumnName = "lastName") })
+    @JoinColumns(value = { @JoinColumn(name = "FK_USER_FIRST_NAME", referencedColumnName = "firstName"),
+            @JoinColumn(name = "FK_USER_LAST_NAME", referencedColumnName = "lastName") },
+            foreignKey = @ForeignKey(name = "FK_CUSTOMER_USER"))
     @OneToOne
     private User user;
 

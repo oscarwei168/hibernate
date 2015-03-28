@@ -1,16 +1,15 @@
 /**
- *
  * Title: Acer Internal Project
  * Copyright: (c) 2015, Acer Inc.
  * Name: AuditInterceptor
  *
  * @author Oscar Wei
  * @since 2015/3/15
- *
+ * <p>
  * H i s t o r y
- *
+ * <p>
  * 2015/3/15 Oscar Wei v1
- * + File created 
+ * + File created
  */
 package tw.com.oscar.orm.hibernate.util;
 
@@ -19,6 +18,7 @@ import org.hibernate.Transaction;
 import org.jboss.logging.Logger;
 import tw.com.oscar.orm.hibernate.domain.Account;
 import tw.com.oscar.orm.hibernate.domain.Credit;
+import tw.com.oscar.orm.hibernate.domain.Role;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
@@ -74,7 +74,7 @@ public class AuditInterceptor extends EmptyInterceptor {
                           Type[] types) {
 
         LOGGER.info("ON SAVE");
-        if (entity instanceof Credit) {
+        if (entity instanceof Role) {
             creates++;
             for (int i = 0; i < propertyNames.length; i++) {
                 if ("description".equals(propertyNames[i])) {

@@ -1,16 +1,15 @@
 /**
- *
  * Title: Acer Internal Project
  * Copyright: (c) 2015, Acer Inc.
  * Name: HibernateUtil
  *
  * @author Oscar Wei
  * @since 2015/3/14
- *
+ * <p>
  * H i s t o r y
- *
+ * <p>
  * 2015/3/14 Oscar Wei v1
- * + File created 
+ * + File created
  */
 package tw.com.oscar.orm.hibernate.util;
 
@@ -39,7 +38,7 @@ public class HibernateUtil {
                     .addAnnotatedClass(ToDo.class).addAnnotatedClass(Credit.class)
                     .addAnnotatedClass(SysParam.class).addAnnotatedClass(Company.class)
                     .addAnnotatedClass(AccountSummary.class).addAnnotatedClass(Customer.class)
-                    .addAnnotatedClass(User.class)
+                    .addAnnotatedClass(User.class).addAnnotatedClass(Department.class)
                     .buildSessionFactory(
                             new StandardServiceRegistryBuilder().build());
         } catch (Throwable ex) {
