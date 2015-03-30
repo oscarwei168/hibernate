@@ -57,6 +57,7 @@ public class HibernateTest {
 //            StatelessSession statelessSession = HibernateUtil.getSessionFactory()
 //                    .openStatelessSession();
 
+            // Normal insert
             Session session = HibernateUtil.getSessionFactory().getCurrentSession();
             Transaction tx = session.beginTransaction();
             Long pid = testCase1(session);
@@ -77,7 +78,7 @@ public class HibernateTest {
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             HibernateUtil.getSessionFactory().getCache().evictEntity(Role.class, pid);
             tx = session.beginTransaction();
-            session.setCacheMode(CacheMode.PUT);
+//            session.setCacheMode(CacheMode.PUT);
             testCache1(session, pid); // comment class-level cache setting
             tx.commit();
             statistics.clear();
@@ -85,8 +86,8 @@ public class HibernateTest {
             // cross session cache testing
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-//            HibernateUtil.getSessionFactory().getCache().evictEntity(Role.class, pid);
-            session.setCacheMode(CacheMode.NORMAL); // default cache mode
+            HibernateUtil.getSessionFactory().getCache().evictEntity(Role.class, pid);
+//            session.setCacheMode(CacheMode.NORMAL); // default cache mode
             testCache2(session, pid); // uncomment class-level cache setting
             tx.commit();
             statistics.clear();
@@ -97,6 +98,7 @@ public class HibernateTest {
             tx.commit();
             statistics.clear();
 
+            // Composition-id searching
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
 //            CompanyId companyId = new CompanyId("EMEA", "0001");
@@ -112,6 +114,7 @@ public class HibernateTest {
             tx.commit();
             statistics.clear();
 
+            // Persisting example
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
             testCase3(session, credit);
@@ -120,16 +123,17 @@ public class HibernateTest {
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-//            accountSummary(session);
+            accountSummary(session);
             tx.commit();
             statistics.clear();
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-//            formula(session);
+            formula(session);
             tx.commit();
             statistics.clear();
 
+            // Named-query example
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
 //            testCase4(session);
@@ -146,7 +150,7 @@ public class HibernateTest {
             // Full-Text searching example
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-//            testFullText(session);
+            testFullText(session);
             tx.commit();
             statistics.clear();
 
@@ -194,15 +198,17 @@ public class HibernateTest {
         Role role = (Role) session.get(Role.class, rolePid);
         role.setRoleName("ROLE_USER");
         role.setUserCreated("XXX"); // Nothing happen...
+        role.setDateCreated(new Date()); // Nothing happen...
         role.setUserLastModified(ADMIN);
         role.setDateLastModified(new Date());
-        session.save(role); // TODO merge()???
+        session.save(role);
         // TODO Open cache/immutable annotations
         return role;
     }
 
     private static void testCase3(Session session, Credit credit) {
 
+        // Self-join example
         Department it = new Department("IT");
         it.setUserCreated(ADMIN);
         it.setDateCreated(new Date());

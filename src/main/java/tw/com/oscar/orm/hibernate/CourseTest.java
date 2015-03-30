@@ -90,7 +90,7 @@ public class CourseTest {
         student2.setUserCreated(ADMIN);
         student2.setDateCreated(new Date());
 
-        // Reference each other
+        // Shared Reference each other
         course.addStudent(student1);
         course.addStudent(student2);
 

@@ -57,7 +57,7 @@ import java.util.Set;
 @DynamicUpdate
 @Where(clause = "1 = 1")
 @NamedQuery(name = Account.SQL_ACCOUNT_FIND_BY_EMAIL, query = "FROM Account a WHERE a.email = :email")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+//@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Indexed
 @AnalyzerDef(name = "customanalyzer",
         tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
@@ -84,7 +84,7 @@ public class Account extends VersionEntity {
 
     private Department department; // 1:1
     private Set<String> telephones; // 1:N value types
-    private Set<Children> childrens;
+//    private Set<Children> childrens;
     private Address homeAddress; // Embedded objects(aka component)
     private Address workAddress;
     private Credit credit; // 1:1
@@ -226,19 +226,19 @@ public class Account extends VersionEntity {
         this.telephones = telephones;
     }
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(
-            name = "CHILDREN",
-            joinColumns = @JoinColumn(name = "PID_ACCOUNT",
-                    foreignKey = @ForeignKey(name = "FK_ACCOUNT_CHILDREN"))
-    )
-    public Set<Children> getChildrens() {
-        return childrens;
-    }
-
-    public void setChildrens(Set<Children> childrens) {
-        this.childrens = childrens;
-    }
+//    @ElementCollection(fetch = FetchType.LAZY)
+//    @CollectionTable(
+//            name = "CHILDREN",
+//            joinColumns = @JoinColumn(name = "PID_ACCOUNT",
+//                    foreignKey = @ForeignKey(name = "FK_ACCOUNT_CHILDREN"))
+//    )
+//    public Set<Children> getChildrens() {
+//        return childrens;
+//    }
+//
+//    public void setChildrens(Set<Children> childrens) {
+//        this.childrens = childrens;
+//    }
 
     @Embedded
     @AttributeOverrides({

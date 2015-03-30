@@ -34,7 +34,7 @@ import java.util.Set;
 @Entity
 @Table(name = "ROLE")
 //@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+//@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 //@Immutable
 @NamedQuery(name = Role.SQL_ROLE_FIND_BY_ROLE_NAME, query = "FROM Role r WHERE r.roleName = :roleName")
 public class Role extends BaseEntity {
