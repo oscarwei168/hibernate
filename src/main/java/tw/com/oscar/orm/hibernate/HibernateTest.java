@@ -24,12 +24,14 @@ import org.jboss.logging.Logger;
 import tw.com.oscar.orm.hibernate.domain.*;
 import tw.com.oscar.orm.hibernate.util.HibernateUtil;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * <strong>Description:</strong><br>
@@ -52,8 +54,8 @@ public class HibernateTest {
             statistics.setStatisticsEnabled(true);
             statistics.clear();
 
-            StatelessSession statelessSession = HibernateUtil.getSessionFactory()
-                    .openStatelessSession();
+//            StatelessSession statelessSession = HibernateUtil.getSessionFactory()
+//                    .openStatelessSession();
 
             Session session = HibernateUtil.getSessionFactory().getCurrentSession();
             Transaction tx = session.beginTransaction();
@@ -84,7 +86,7 @@ public class HibernateTest {
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
 //            HibernateUtil.getSessionFactory().getCache().evictEntity(Role.class, pid);
-            session.setCacheMode(CacheMode.NORMAL);
+            session.setCacheMode(CacheMode.NORMAL); // default cache mode
             testCache2(session, pid); // uncomment class-level cache setting
             tx.commit();
             statistics.clear();
@@ -105,13 +107,14 @@ public class HibernateTest {
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-//            Credit credit = createCredit(session);
+            Credit credit = createCredit(session);
+            session.delete(role); // TODO
             tx.commit();
             statistics.clear();
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-//            testCase3(session, credit);
+            testCase3(session, credit);
             tx.commit();
             statistics.clear();
 
@@ -129,7 +132,7 @@ public class HibernateTest {
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-            testCase4(session);
+//            testCase4(session);
             tx.commit();
             statistics.clear();
 
@@ -193,12 +196,13 @@ public class HibernateTest {
         role.setUserCreated("XXX"); // Nothing happen...
         role.setUserLastModified(ADMIN);
         role.setDateLastModified(new Date());
-        session.merge(role); // TODO merge()???
+        session.save(role); // TODO merge()???
         // TODO Open cache/immutable annotations
         return role;
     }
 
     private static void testCase3(Session session, Credit credit) {
+
         Department it = new Department("IT");
         it.setUserCreated(ADMIN);
         it.setDateCreated(new Date());
@@ -223,9 +227,19 @@ public class HibernateTest {
         account.setUserCreated(ADMIN);
         account.setDateCreated(new Date());
 
+        LobHelper helper = session.getLobHelper();
+        try {
+            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(new File
+                    ("D:/Oscar/ImageSmall.gif")));
+            account.setPhoto(helper.createBlob(bis, bis.available()));
+            account.setDescription(helper.createNClob("我是Oscar Wei,大家好"));
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+
         Address home = new Address();
         home.setCity("Taipei");
-        home.setStreet("Xxxxx");
+        home.setStreet("信義豪宅");
         home.setZipCode("101");
 
         Address work = new Address();
@@ -236,19 +250,19 @@ public class HibernateTest {
         account.setHomeAddress(home);
         account.setWorkAddress(work);
 
-        Role admin = new Role();
-        admin.setRoleName("ROLE_ADMIN");
-        admin.setUserCreated(ADMIN);
-        admin.setDateCreated(new Date());
+        Role adminRole = new Role();
+        adminRole.setRoleName("ROLE_ADMIN");
+        adminRole.setUserCreated(ADMIN);
+        adminRole.setDateCreated(new Date());
 
-        Role user = new Role();
-        user.setRoleName("ROLE_USER");
-        user.setUserCreated(ADMIN);
-        user.setDateCreated(new Date());
+        Role userRole = new Role();
+        userRole.setRoleName("ROLE_USER");
+        userRole.setUserCreated(ADMIN);
+        userRole.setDateCreated(new Date());
 
         Instant instant = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant();
-        ToDo do1 = new ToDo("subject1", "Desc1", Date.from(instant));
-        ToDo do2 = new ToDo("subject2", "Desc2", Date.from(instant));
+        ToDo do1 = new ToDo("打混", "Desc1", Date.from(instant));
+        ToDo do2 = new ToDo("摸魚", "Desc2", Date.from(instant));
         do1.setUserCreated(ADMIN);
         do2.setUserCreated(ADMIN);
         do1.setDateCreated(new Date());
@@ -263,12 +277,18 @@ public class HibernateTest {
         session.save(pg);
         session.save(service);
         session.save(it);
+//        session.merge(userRole);
 
         account.setDepartment(pg);
         account.setCredit(credit);
         credit.setAccount(account);
-        account.addRole(admin);
-        account.addRole(user);
+
+//        Hibernate.initialize(userRole.getAccounts());
+//        userRole.getAccounts().add(account);
+//        Set<Role> roles = new HashSet<>(Arrays.asList(userRole));
+        account.addRole(adminRole);
+        account.addRole(userRole);
+//        account.setRoles(roles);
         session.save(account);
     }
 

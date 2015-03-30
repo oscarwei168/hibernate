@@ -33,7 +33,12 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
-import java.util.*;
+import java.sql.Blob;
+import java.sql.Clob;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * <strong>Description:</strong><br>
@@ -74,15 +79,16 @@ public class Account extends VersionEntity {
     private String email;
     private BigDecimal salary;
     private BigDecimal yearEndBonus;
-    private Byte[] photo;
+    private Blob photo;
+    private Clob description;
 
     private Department department; // 1:1
     private Set<String> telephones; // 1:N value types
-    private Address homeAddress; // Embedded objects
+    private Set<Children> childrens;
+    private Address homeAddress; // Embedded objects(aka component)
     private Address workAddress;
     private Credit credit; // 1:1
     private Set<Role> roles = new HashSet<>(); // N:M
-    // private Set<Address> addressSet; // 1:N(U)
     private List<ToDo> toDoSet = new LinkedList<>(); // 1:N(B)(INX)
 
     public Account() {
@@ -176,12 +182,22 @@ public class Account extends VersionEntity {
 
     @Lob
     @Column(name = "PHOTO")
-    public Byte[] getPhoto() {
+    public Blob getPhoto() {
         return photo;
     }
 
-    public void setPhoto(Byte[] photo) {
+    public void setPhoto(Blob photo) {
         this.photo = photo;
+    }
+
+    @Lob
+    @Column(name = "DESCRIPTION")
+    public Clob getDescription() {
+        return description;
+    }
+
+    public void setDescription(Clob description) {
+        this.description = description;
     }
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
@@ -208,6 +224,20 @@ public class Account extends VersionEntity {
 
     public void setTelephones(Set<String> telephones) {
         this.telephones = telephones;
+    }
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "CHILDREN",
+            joinColumns = @JoinColumn(name = "PID_ACCOUNT",
+                    foreignKey = @ForeignKey(name = "FK_ACCOUNT_CHILDREN"))
+    )
+    public Set<Children> getChildrens() {
+        return childrens;
+    }
+
+    public void setChildrens(Set<Children> childrens) {
+        this.childrens = childrens;
     }
 
     @Embedded
@@ -253,11 +283,11 @@ public class Account extends VersionEntity {
     @org.hibernate.annotations.ForeignKey(name = "FK_ACCOUNT_ROLE")
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @Fetch(FetchMode.JOIN)
-    protected Set<Role> getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
-    protected void setRoles(Set<Role> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 
@@ -319,14 +349,19 @@ public class Account extends VersionEntity {
         if (salary != null ? !salary.equals(account.salary) : account.salary != null) return false;
         if (yearEndBonus != null ? !yearEndBonus.equals(account.yearEndBonus) : account.yearEndBonus != null)
             return false;
-        // Probably incorrect - comparing Object[] arrays with Arrays.equals
-        if (!Arrays.equals(photo, account.photo)) return false;
+        if (photo != null ? !photo.equals(account.photo) : account.photo != null) return false;
+        if (description != null ? !description.equals(account.description) : account.description != null)
+            return false;
+        if (department != null ? !department.equals(account.department) : account.department != null)
+            return false;
         if (telephones != null ? !telephones.equals(account.telephones) : account.telephones != null)
+            return false;
+        if (homeAddress != null ? !homeAddress.equals(account.homeAddress) : account.homeAddress != null)
+            return false;
+        if (workAddress != null ? !workAddress.equals(account.workAddress) : account.workAddress != null)
             return false;
         if (credit != null ? !credit.equals(account.credit) : account.credit != null) return false;
         if (roles != null ? !roles.equals(account.roles) : account.roles != null) return false;
-//        if (addressSet != null ? !addressSet.equals(account.addressSet) : account.addressSet != null)
-//            return false;
         return !(toDoSet != null ? !toDoSet.equals(account.toDoSet) : account.toDoSet != null);
 
     }
@@ -341,11 +376,14 @@ public class Account extends VersionEntity {
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (salary != null ? salary.hashCode() : 0);
         result = 31 * result + (yearEndBonus != null ? yearEndBonus.hashCode() : 0);
-        result = 31 * result + (photo != null ? Arrays.hashCode(photo) : 0);
+        result = 31 * result + (photo != null ? photo.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (department != null ? department.hashCode() : 0);
         result = 31 * result + (telephones != null ? telephones.hashCode() : 0);
+        result = 31 * result + (homeAddress != null ? homeAddress.hashCode() : 0);
+        result = 31 * result + (workAddress != null ? workAddress.hashCode() : 0);
         result = 31 * result + (credit != null ? credit.hashCode() : 0);
         result = 31 * result + (roles != null ? roles.hashCode() : 0);
-//        result = 31 * result + (addressSet != null ? addressSet.hashCode() : 0);
         result = 31 * result + (toDoSet != null ? toDoSet.hashCode() : 0);
         return result;
     }

@@ -35,7 +35,7 @@ public class BaseEntity implements Serializable {
         this.pid = pid;
     }
 
-    @Column(name = "USER_CREATED", nullable = false, updatable = false)
+    @Column(name = "USER_CREATED", nullable = false, updatable = false, length = 50)
     @NotNull
     @Size(max = 50)
     public String getUserCreated() {
@@ -57,7 +57,7 @@ public class BaseEntity implements Serializable {
         this.dateCreated = dateCreated;
     }
 
-    @Column(name = "USER_LAST_MODIFIED", insertable = false)
+    @Column(name = "USER_LAST_MODIFIED", insertable = false, length = 50)
     @Size(max = 50)
     public String getUserLastModified() {
         return userLastModified;

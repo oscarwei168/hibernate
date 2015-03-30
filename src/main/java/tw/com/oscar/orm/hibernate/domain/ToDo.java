@@ -15,7 +15,9 @@ package tw.com.oscar.orm.hibernate.domain;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Proxy;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -30,6 +32,8 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "TODO")
+//@Indexed
+//@Proxy(lazy = true) // ???
 public class ToDo extends BaseEntity {
 
     private String subject;
