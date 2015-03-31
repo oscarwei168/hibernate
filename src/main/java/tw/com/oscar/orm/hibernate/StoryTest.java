@@ -26,6 +26,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import static java.util.stream.Collectors.joining;
+
 /**
  * <strong>Description:</strong><br>
  * This function include: - TODO <br/>
@@ -49,11 +51,17 @@ public class StoryTest {
 
             Session session = HibernateUtil.getSessionFactory().getCurrentSession();
             Transaction tx = session.beginTransaction();
-            test(session);
+            test1(session);
             tx.commit();
             EntityStatistics statistic = statistics.getEntityStatistics(Story.class.getName());
             LOGGER.info("InsertCount : " + statistic.getInsertCount());
             statistics.clear();
+
+            session = HibernateUtil.getSessionFactory().getCurrentSession();
+            tx = session.beginTransaction();
+            HibernateUtil.getSessionFactory().getCache().evictEntity(Story.class, 1L);
+            test2(session);
+            tx.commit();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         } finally {
@@ -66,7 +74,7 @@ public class StoryTest {
 
     }
 
-    private static void test(Session session) {
+    private static void test1(Session session) {
         Story story = new Story("Story 1");
         story.setUserCreated(ADMIN);
         story.setDateCreated(new Date());
@@ -89,13 +97,13 @@ public class StoryTest {
         storyItems.add(item2);
         storyItems.add(item3);
         story.setStoryItems(storyItems);
-        session.save(story);
+        session.save(story); // TODO Good BUT not good enough
 
         // N:1(U)
 //        item1.setStory(story);
 //        item2.setStory(story);
 //        item3.setStory(story);
-//        session.save(item1); // TODO bed solution
+//        session.save(item1); // TODO Bed solution
 //        session.save(item2);
 //        session.save(item3);
 
@@ -108,7 +116,17 @@ public class StoryTest {
 //        storyItems.add(item2);
 //        storyItems.add(item3);
 //        story.setStoryItems(storyItems);
-//        session.save(story);
+//        session.save(story); // TODO Good solution
+
+    }
+
+    private static void test2(Session session) throws Exception {
+        Story story = (Story) session.get(Story.class, 1L); // TODO get() vs load()
+        if (null != story) {
+            Set<StoryItem> storyItems = story.getStoryItems();
+            LOGGER.info("Items : " + storyItems.stream().map(StoryItem::getName).distinct()
+                    .sorted().collect(joining(", ")));
+        }
 
     }
 

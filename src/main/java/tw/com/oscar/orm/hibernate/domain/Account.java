@@ -17,7 +17,6 @@ import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.hibernate.annotations.*;
-import org.hibernate.annotations.Cache;
 import org.hibernate.search.annotations.*;
 import org.hibernate.search.annotations.Parameter;
 import org.hibernate.validator.constraints.Email;
@@ -57,7 +56,6 @@ import java.util.Set;
 @DynamicUpdate
 @Where(clause = "1 = 1")
 @NamedQuery(name = Account.SQL_ACCOUNT_FIND_BY_EMAIL, query = "FROM Account a WHERE a.email = :email")
-//@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Indexed
 @AnalyzerDef(name = "customanalyzer",
         tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),

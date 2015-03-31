@@ -13,6 +13,10 @@
  */
 package tw.com.oscar.orm.hibernate.domain;
 
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -27,6 +31,7 @@ import java.util.Set;
 @Entity
 @Table(name = "STORY",
         uniqueConstraints = @UniqueConstraint(name = "UK_NAME", columnNames = { "NAME" }))
+@Access(AccessType.PROPERTY)
 public class Story extends BaseEntity {
 
     private String name;
@@ -53,6 +58,9 @@ public class Story extends BaseEntity {
     @JoinColumn(name = "PID_STORY",
             foreignKey = @ForeignKey(name = "FK_STORY_STORYITEM")) // uncomment when 1:N(B)
     @org.hibernate.annotations.ForeignKey(name = "FK_STORY_STORYITEM") // uncomment when 1:N(B)
+    @Fetch(FetchMode.SELECT) // default
+//    @Fetch(FetchMode.JOIN)
+    @BatchSize(size = 2)
     public Set<StoryItem> getStoryItems() {
         return storyItems;
     }
