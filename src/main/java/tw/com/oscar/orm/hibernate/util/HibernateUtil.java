@@ -37,7 +37,8 @@ public class HibernateUtil {
         try {
             return new Configuration().addAnnotatedClass(Course.class)
                     .addAnnotatedClass(Student.class).addAnnotatedClass(Story.class)
-                    .addAnnotatedClass(StoryItem.class)
+                    .addAnnotatedClass(StoryItem.class).addAnnotatedClass(Employee.class)
+                    .addAnnotatedClass(Permission.class).addAnnotatedClass(EmployeePermission.class)
                     .setInterceptor(new AuditInterceptor()).buildSessionFactory(new
                             StandardServiceRegistryBuilder().build());
 

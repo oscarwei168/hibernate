@@ -46,11 +46,10 @@ public class Course extends BaseEntity {
     }
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @org.hibernate.annotations.ForeignKey(name = "FK_ACCOUNT_ROLE")
-//    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinTable(name = "COURSE_STUDENT",
-            joinColumns = { @JoinColumn(name = "PID_COURSE") },
-            inverseJoinColumns = { @JoinColumn(name = "PID_STUDENT") })
+            joinColumns = { @JoinColumn(name = "PID_COURSE", nullable = false, updatable = false) },
+            inverseJoinColumns = { @JoinColumn(name = "PID_STUDENT", nullable = false, updatable
+                    = false) })
     public Set<Student> getStudents() {
         return students;
     }

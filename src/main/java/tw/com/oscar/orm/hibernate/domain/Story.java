@@ -13,7 +13,6 @@
  */
 package tw.com.oscar.orm.hibernate.domain;
 
-import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -45,24 +44,25 @@ public class Story extends BaseEntity {
         this.name = name;
     }
 
-    @Column(name = "NAME", nullable = false, length = 20)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // mappedBy = "story"
+    @JoinColumn(name = "PID_STORY",
+            foreignKey = @ForeignKey(name = "FK_STORY_STORYITEM")) // uncomment when 1:N(B)
+    @org.hibernate.annotations.ForeignKey(name = "FK_STORY_STORYITEM") // uncomment when 1:N(B)
+    @Fetch(FetchMode.SELECT) // by default
+//    @Fetch(FetchMode.JOIN) // disable lazy-loading
+//    @BatchSize(size = 5)
+//    @Fetch(FetchMode.SUBSELECT)
+    public Set<StoryItem> getStoryItems() {
+        return storyItems;
+    }
+
+    @Column(name = "NAME", nullable = false, unique = true, length = 20)
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // mappedBy = "story"
-    @JoinColumn(name = "PID_STORY",
-            foreignKey = @ForeignKey(name = "FK_STORY_STORYITEM")) // uncomment when 1:N(B)
-    @org.hibernate.annotations.ForeignKey(name = "FK_STORY_STORYITEM") // uncomment when 1:N(B)
-    @Fetch(FetchMode.SELECT) // default
-//    @Fetch(FetchMode.JOIN)
-    @BatchSize(size = 2)
-    public Set<StoryItem> getStoryItems() {
-        return storyItems;
     }
 
     public void setStoryItems(Set<StoryItem> storyItems) {

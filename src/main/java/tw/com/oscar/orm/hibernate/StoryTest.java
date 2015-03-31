@@ -15,6 +15,7 @@ package tw.com.oscar.orm.hibernate;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Example;
 import org.hibernate.stat.EntityStatistics;
 import org.hibernate.stat.Statistics;
 import org.jboss.logging.Logger;
@@ -22,9 +23,7 @@ import tw.com.oscar.orm.hibernate.domain.Story;
 import tw.com.oscar.orm.hibernate.domain.StoryItem;
 import tw.com.oscar.orm.hibernate.util.HibernateUtil;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.stream.Collectors.joining;
 
@@ -62,6 +61,18 @@ public class StoryTest {
             HibernateUtil.getSessionFactory().getCache().evictEntity(Story.class, 1L);
             test2(session);
             tx.commit();
+
+            session = HibernateUtil.getSessionFactory().getCurrentSession();
+            tx = session.beginTransaction();
+            HibernateUtil.getSessionFactory().getCache().evictEntity(Story.class, 1L);
+//            prepareData(session);
+            tx.commit();
+
+            session = HibernateUtil.getSessionFactory().getCurrentSession();
+            tx = session.beginTransaction();
+            HibernateUtil.getSessionFactory().getCache().evictEntity(Story.class, 1L);
+//            test3(session);
+            tx.commit();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         } finally {
@@ -75,7 +86,7 @@ public class StoryTest {
     }
 
     private static void test1(Session session) {
-        Story story = new Story("Story 1");
+        Story story = new Story("Story 0");
         story.setUserCreated(ADMIN);
         story.setDateCreated(new Date());
 
@@ -128,6 +139,48 @@ public class StoryTest {
                     .sorted().collect(joining(", ")));
         }
 
+    }
+
+    private static void test3(Session session) {
+        Example example = Example.create(new Story()).excludeZeroes().ignoreCase();
+        List<Story> storys = session.createCriteria(Story.class).add(example).list();
+
+        for (Story story : storys) {
+            LOGGER.info(story.getName());
+            Set<StoryItem> items = story.getStoryItems();
+            for (Iterator<StoryItem> iters = items.iterator(); iters.hasNext(); ) {
+                StoryItem item = iters.next();
+                LOGGER.info(item.getName());
+            }
+
+        }
+    }
+
+    private static void prepareData(Session session) {
+
+        for (int i = 1; i <= 10; i++) {
+            Story story = new Story("Story " + i);
+            story.setUserCreated(ADMIN);
+            story.setDateCreated(new Date());
+
+            for (int j = 1; j <= 2; j++) {
+                StoryItem item = new StoryItem("Item " + i + j);
+                item.setUserCreated(ADMIN);
+                item.setDateCreated(new Date());
+                add(story, item);
+
+            }
+
+            session.save(story);
+        }
+
+    }
+
+    private static void add(Story story, StoryItem storyItem) {
+        if (null == story.getStoryItems()) {
+            story.setStoryItems(new HashSet<>());
+        }
+        story.getStoryItems().add(storyItem);
     }
 
 }

@@ -23,8 +23,6 @@ import tw.com.oscar.orm.hibernate.domain.Student;
 import tw.com.oscar.orm.hibernate.util.HibernateUtil;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * <strong>Description:</strong><br>
@@ -62,6 +60,7 @@ public class CourseTest {
             statistic = statistics.getEntityStatistics(Course.class.getName());
             LOGGER.info("InsertCount : " + statistic.getInsertCount());
             statistics.clear();
+
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         } finally {
@@ -102,11 +101,14 @@ public class CourseTest {
         Course course = (Course) session.get(Course.class, pid);
         session.delete(course);
 
-//        Student[] students = course.getStudents().toArray(new Student[0]);
-//        Student student1 = students[0];
-//        course.getStudents().remove(student1);
+//        Student student = new Student();
+//        student.setName("oscar");
+//        Example example = Example.create(student).ignoreCase().enableLike(MatchMode.ANYWHERE);
+//        Student selectedStudent = (Student) session.createCriteria(Student.class).add(example)
+//                .uniqueResult();
+//        course.getStudents().remove(selectedStudent);
+//        session.delete(selectedStudent);
 
-//        session.delete(student1);
     }
 
 }
