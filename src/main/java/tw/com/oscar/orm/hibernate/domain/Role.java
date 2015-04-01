@@ -13,15 +13,13 @@
  */
 package tw.com.oscar.orm.hibernate.domain;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+
+//import javax.persistence.*;
 
 /**
  * <strong>Description:</strong><br>
@@ -33,15 +31,13 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "ROLE")
-//@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-//@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-//@Immutable
 @NamedQuery(name = Role.SQL_ROLE_FIND_BY_ROLE_NAME, query = "FROM Role r WHERE r.roleName = :roleName")
 public class Role extends BaseEntity {
 
-    public static final String SQL_ROLE_FIND_BY_ROLE_NAME = "roleFileByRoleName";
+    public static final String SQL_ROLE_FIND_BY_ROLE_NAME = "Role.FindByRoleName";
 
     private String roleName;
+    private String description;
 
     private Set<Account> accounts = new HashSet<>();
 
@@ -57,6 +53,15 @@ public class Role extends BaseEntity {
         this.roleName = roleName;
     }
 
+    @Column(name = "DESCRIPTION", length = 100)
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @ManyToMany(targetEntity = Account.class)
     @JoinTable(name = "ACCOUNT_ROLE", joinColumns = { @JoinColumn(name = "PID_ROLE") },
             inverseJoinColumns = { @JoinColumn(name = "PID_ACCOUNT") })
@@ -68,5 +73,29 @@ public class Role extends BaseEntity {
 
     public void setAccounts(Set<Account> accounts) {
         this.accounts = accounts;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Role role = (Role) o;
+
+        return !(getRoleName() != null ? !getRoleName().equals(role.getRoleName()) : role.getRoleName() != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return getRoleName() != null ? getRoleName().hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "Role{" +
+                "roleName='" + roleName + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

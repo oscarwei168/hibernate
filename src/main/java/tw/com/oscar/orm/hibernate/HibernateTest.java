@@ -31,7 +31,9 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 /**
  * <strong>Description:</strong><br>
@@ -54,9 +56,6 @@ public class HibernateTest {
             statistics.setStatisticsEnabled(true);
             statistics.clear();
 
-//            StatelessSession statelessSession = HibernateUtil.getSessionFactory()
-//                    .openStatelessSession();
-
             // Normal insert
             Session session = HibernateUtil.getSessionFactory().getCurrentSession();
             Transaction tx = session.beginTransaction();
@@ -74,29 +73,32 @@ public class HibernateTest {
             LOGGER.info("UpdateCount : " + roleStatic.getUpdateCount());
             statistics.clear();
 
-            // same session cache testing
+            // same-session cache testing
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             HibernateUtil.getSessionFactory().getCache().evictEntity(Role.class, pid);
             tx = session.beginTransaction();
 //            session.setCacheMode(CacheMode.PUT);
-            testCache1(session, pid); // comment class-level cache setting
+            List<Role> roles = testCache1(session, pid); // comment class-level cache setting
             tx.commit();
             statistics.clear();
 
-            // cross session cache testing
+            // cross-session cache testing
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-            HibernateUtil.getSessionFactory().getCache().evictEntity(Role.class, pid);
+//            HibernateUtil.getSessionFactory().getCache().evictEntity(Role.class, pid);
 //            session.setCacheMode(CacheMode.NORMAL); // default cache mode
-            testCache2(session, pid); // uncomment class-level cache setting
+            Role role3 = testCache2(session, pid); // uncomment class-level cache setting
             tx.commit();
             statistics.clear();
 
-            session = HibernateUtil.getSessionFactory().getCurrentSession();
-            tx = session.beginTransaction();
-            testCache2(session, pid);
-            tx.commit();
-            statistics.clear();
+            boolean isContain = roles.contains(role3);
+            assert isContain : "WRONG REFERENCE???";
+
+//            session = HibernateUtil.getSessionFactory().getCurrentSession();
+//            tx = session.beginTransaction();
+//            testCache2(session, pid);
+//            tx.commit();
+//            statistics.clear();
 
             // Composition-id searching
             session = HibernateUtil.getSessionFactory().getCurrentSession();
@@ -109,27 +111,27 @@ public class HibernateTest {
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-            Credit credit = createCredit(session);
-            session.delete(role); // TODO
+//            Credit credit = createCredit(session);
+//            session.delete(role); // TODO
             tx.commit();
             statistics.clear();
 
             // Persisting example
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-            testCase3(session, credit);
+//            testCase3(session, credit);
             tx.commit();
             statistics.clear();
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-            accountSummary(session);
+//            accountSummary(session);
             tx.commit();
             statistics.clear();
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-            formula(session);
+//            formula(session);
             tx.commit();
             statistics.clear();
 
@@ -150,7 +152,7 @@ public class HibernateTest {
             // Full-Text searching example
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-            testFullText(session);
+//            testFullText(session);
             tx.commit();
             statistics.clear();
 
@@ -160,19 +162,26 @@ public class HibernateTest {
             if (null != statistics) {
                 statistics.setStatisticsEnabled(false);
             }
-            HibernateUtil.getSessionFactory().close();
+//            HibernateUtil.getSessionFactory().close();
             LOGGER.info("Hibernate session is closed");
         }
 
     }
 
-    private static void testCache1(Session session, Long pid) {
+    private static List<Role> testCache1(Session session, Long pid) {
         Role role1 = (Role) session.get(Role.class, pid);
         Role role2 = (Role) session.get(Role.class, pid);
+
+        boolean isSame = role1 == role2;
+        assert isSame;
+
+        List<Role> roles = Arrays.asList(role1, role2);
+        return roles;
     }
 
-    private static void testCache2(Session session, Long pid) {
+    private static Role testCache2(Session session, Long pid) {
         Role role1 = (Role) session.get(Role.class, pid);
+        return role1;
     }
 
     /**

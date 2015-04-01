@@ -30,14 +30,14 @@ import tw.com.oscar.orm.hibernate.util.AuditInterceptor;
  * This function include: - TODO <br>
  *
  * @author Oscar Wei
- * @since 2015/3/28
  * @version v1, 2015/3/28
+ * @since 2015/3/28
  */
 public class HibernateTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateTest.class);
 
-//    private ApplicationContext factory;
+    //    private ApplicationContext factory;
     private Statistics statistics = null;
     private Session session = null;
 
@@ -84,7 +84,7 @@ public class HibernateTest {
                     .addAnnotatedClass(Account.class)
                     .addAnnotatedClass(Role.class).addAnnotatedClass(Address.class)
                     .addAnnotatedClass(ToDo.class).addAnnotatedClass(Credit.class)
-                    .addAnnotatedClass(SysParam.class).addAnnotatedClass(Company.class)
+                    .addAnnotatedClass(Company.class)
                     .addAnnotatedClass(AccountSummary.class).addAnnotatedClass(Customer.class)
                     .addAnnotatedClass(User.class).addAnnotatedClass(Department.class)
                     .buildSessionFactory(
