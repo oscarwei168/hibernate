@@ -46,7 +46,7 @@ public class EmployeeTest {
             statistics.clear();
 
             Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-            session.getTransaction().setTimeout(10); // 10 seconds
+//            session.getTransaction().setTimeout(10); // 10 seconds
             Transaction tx = session.beginTransaction();
             test1(session);
             tx.commit();
@@ -56,12 +56,11 @@ public class EmployeeTest {
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-            test2(session);
+//            test2(session); // TODO not a special case
             tx.commit();
             statistic = statistics.getEntityStatistics(Employee.class.getName());
             LOGGER.info("InsertCount : " + statistic.getInsertCount());
             statistics.clear();
-
 
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);

@@ -99,15 +99,16 @@ public class CourseTest {
 
     private static void test2(Session session, Long pid) {
         Course course = (Course) session.get(Course.class, pid);
-        session.delete(course);
+        session.delete(course); // 開錯課
 
 //        Student student = new Student();
 //        student.setName("oscar");
 //        Example example = Example.create(student).ignoreCase().enableLike(MatchMode.ANYWHERE);
 //        Student selectedStudent = (Student) session.createCriteria(Student.class).add(example)
 //                .uniqueResult();
-//        course.getStudents().remove(selectedStudent);
-//        session.delete(selectedStudent);
+//        course.getStudents().remove(selectedStudent); // 學生退選
+//
+//        session.delete(selectedStudent); // 學生休學
 
     }
 

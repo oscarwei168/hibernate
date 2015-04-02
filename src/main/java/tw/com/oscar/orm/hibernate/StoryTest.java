@@ -48,6 +48,7 @@ public class StoryTest {
             statistics.setStatisticsEnabled(true);
             statistics.clear();
 
+            // 1:N(U and B) example
             Session session = HibernateUtil.getSessionFactory().getCurrentSession();
             Transaction tx = session.beginTransaction();
             test1(session);
@@ -56,22 +57,24 @@ public class StoryTest {
             LOGGER.info("InsertCount : " + statistic.getInsertCount());
             statistics.clear();
 
+            // get() and load() example
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
             HibernateUtil.getSessionFactory().getCache().evictEntity(Story.class, 1L);
-            test2(session);
+//            test2(session);
             tx.commit();
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
             HibernateUtil.getSessionFactory().getCache().evictEntity(Story.class, 1L);
-//            prepareData(session);
+            prepareData(session);
             tx.commit();
 
+            // FetchMode examples
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
             HibernateUtil.getSessionFactory().getCache().evictEntity(Story.class, 1L);
-//            test3(session);
+            test3(session);
             tx.commit();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -132,7 +135,7 @@ public class StoryTest {
     }
 
     private static void test2(Session session) throws Exception {
-        Story story = (Story) session.get(Story.class, 1L); // TODO get() vs load()
+        Story story = (Story) session.load(Story.class, 1L); // TODO get() vs load()
         if (null != story) {
             Set<StoryItem> storyItems = story.getStoryItems();
             LOGGER.info("Items : " + storyItems.stream().map(StoryItem::getName).distinct()

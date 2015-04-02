@@ -32,6 +32,8 @@ import java.util.Set;
 @Entity
 @Table(name = "ROLE")
 @NamedQuery(name = Role.SQL_ROLE_FIND_BY_ROLE_NAME, query = "FROM Role r WHERE r.roleName = :roleName")
+//@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+//@Immutable
 public class Role extends BaseEntity {
 
     public static final String SQL_ROLE_FIND_BY_ROLE_NAME = "Role.FindByRoleName";
@@ -75,21 +77,21 @@ public class Role extends BaseEntity {
         this.accounts = accounts;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Role role = (Role) o;
-
-        return !(getRoleName() != null ? !getRoleName().equals(role.getRoleName()) : role.getRoleName() != null);
-
-    }
-
-    @Override
-    public int hashCode() {
-        return getRoleName() != null ? getRoleName().hashCode() : 0;
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//
+//        Role role = (Role) o;
+//
+//        return !(getRoleName() != null ? !getRoleName().equals(role.getRoleName()) : role.getRoleName() != null);
+//
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return getRoleName() != null ? getRoleName().hashCode() : 0;
+//    }
 
     @Override
     public String toString() {

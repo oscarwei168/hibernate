@@ -56,6 +56,10 @@ public class Story extends BaseEntity {
         return storyItems;
     }
 
+    public void setStoryItems(Set<StoryItem> storyItems) {
+        this.storyItems = storyItems;
+    }
+
     @Column(name = "NAME", nullable = false, unique = true, length = 20)
     public String getName() {
         return name;
@@ -63,10 +67,6 @@ public class Story extends BaseEntity {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setStoryItems(Set<StoryItem> storyItems) {
-        this.storyItems = storyItems;
     }
 
     @Override

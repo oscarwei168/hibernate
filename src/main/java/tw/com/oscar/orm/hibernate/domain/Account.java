@@ -95,14 +95,14 @@ public class Account extends VersionEntity {
     @Column(name = "USERNAME", nullable = false, length = 50, unique = true, updatable = false)
     @NotNull
     @Size(min = 5, max = 50)
-    @NaturalId(mutable = false)
+    @NaturalId
     @Field(index = org.hibernate.search.annotations.Index.YES, analyze = Analyze.YES, store = Store.NO)
     @Analyzer(definition = "customanalyzer")
     public String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(@NotNull String username) {
         this.username = username;
     }
 

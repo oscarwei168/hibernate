@@ -94,9 +94,15 @@ public class HibernateTest {
             boolean isContain = roles.contains(role3);
             assert isContain : "WRONG REFERENCE???";
 
+            // update() and merge() examples
+//            role3.setDescription("Xxxxx"); // state?
+//
 //            session = HibernateUtil.getSessionFactory().getCurrentSession();
 //            tx = session.beginTransaction();
-//            testCache2(session, pid);
+//            Role role4 = testCache2(session, pid);
+//            role4.setDescription("Yyyyyy");
+//            session.update(role3);
+////            session.merge(role3);
 //            tx.commit();
 //            statistics.clear();
 
@@ -175,7 +181,7 @@ public class HibernateTest {
         boolean isSame = role1 == role2;
         assert isSame;
 
-        List<Role> roles = Arrays.asList(role1, role2);
+        List<Role> roles = Arrays.asList(role1);
         return roles;
     }
 
@@ -206,12 +212,11 @@ public class HibernateTest {
     private static Role testCase2(Session session, Long rolePid) {
         Role role = (Role) session.get(Role.class, rolePid);
         role.setRoleName("ROLE_USER");
-        role.setUserCreated("XXX"); // Nothing happen...
-        role.setDateCreated(new Date()); // Nothing happen...
+        role.setUserCreated("Oscar.Admin"); // Nothing happen...
+        role.setDateCreated(new Date());
         role.setUserLastModified(ADMIN);
         role.setDateLastModified(new Date());
         session.save(role);
-        // TODO Open cache/immutable annotations
         return role;
     }
 
@@ -313,19 +318,14 @@ public class HibernateTest {
     }
 
     private static void testCase4(Session session) {
-//        Account account = (Account) session.get(Account.class, 1L);
-//        session.delete(account);
-
         Query query = session.getNamedQuery(Role.SQL_ROLE_FIND_BY_ROLE_NAME);
         query.setParameter("roleName", "ROLE_USER");
-//        query.setCacheable(true).setCacheRegion("sampleCache1");
+        query.setCacheable(true).setCacheRegion("samp   leCache1");
         Role user = (Role) query.uniqueResult();
         session.delete(user);
     }
 
     private static void testNaturalId(Session session) {
-//        List<Account> accounts = session.createCriteria(Account.class)
-//                .add(Restrictions.naturalId().set("username", "oscarwei")).list();
         NaturalIdLoadAccess naturalIdentifier = session.byNaturalId(Account.class);
         naturalIdentifier.using("username", "oscarwei");
         Account account = (Account) naturalIdentifier.load();
