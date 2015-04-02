@@ -46,7 +46,7 @@ public class EmployeeTest {
             statistics.clear();
 
             Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-//            session.getTransaction().setTimeout(10); // 10 seconds
+//            session.getTransaction().setTimeout(10); // TODO in seconds - it is work
             Transaction tx = session.beginTransaction();
             test1(session);
             tx.commit();

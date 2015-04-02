@@ -35,23 +35,23 @@ public class HibernateUtil {
 
     private static SessionFactory buildSessionFactory() {
         try {
-            return new Configuration().addAnnotatedClass(Course.class)
-                    .addAnnotatedClass(Student.class).addAnnotatedClass(Story.class)
-                    .addAnnotatedClass(StoryItem.class).addAnnotatedClass(Employee.class)
-                    .addAnnotatedClass(Permission.class).addAnnotatedClass(EmployeePermission.class)
-                    .setInterceptor(new AuditInterceptor()).buildSessionFactory(new
-                            StandardServiceRegistryBuilder().build());
+//            return new Configuration().addAnnotatedClass(Course.class)
+//                    .addAnnotatedClass(Student.class).addAnnotatedClass(Story.class)
+//                    .addAnnotatedClass(StoryItem.class).addAnnotatedClass(Employee.class)
+//                    .addAnnotatedClass(Permission.class).addAnnotatedClass(EmployeePermission.class)
+//                    .setInterceptor(new AuditInterceptor()).buildSessionFactory(new
+//                            StandardServiceRegistryBuilder().build());
 
-//            return new Configuration().configure().setInterceptor(new AuditInterceptor())
-//                    .addPackage("tw.com.oscar.orm.hibernate.domain")
-//                    .addAnnotatedClass(Account.class)
-//                    .addAnnotatedClass(Role.class).addAnnotatedClass(Address.class)
-//                    .addAnnotatedClass(ToDo.class).addAnnotatedClass(Credit.class)
-//                    .addAnnotatedClass(Company.class)
-//                    .addAnnotatedClass(AccountSummary.class).addAnnotatedClass(Customer.class)
-//                    .addAnnotatedClass(User.class).addAnnotatedClass(Department.class)
-//                    .buildSessionFactory(
-//                            new StandardServiceRegistryBuilder().build());
+            return new Configuration().configure().setInterceptor(new AuditInterceptor())
+                    .addPackage("tw.com.oscar.orm.hibernate.domain")
+                    .addAnnotatedClass(Account.class)
+                    .addAnnotatedClass(Role.class).addAnnotatedClass(Address.class)
+                    .addAnnotatedClass(ToDo.class).addAnnotatedClass(Credit.class)
+                    .addAnnotatedClass(Company.class)
+                    .addAnnotatedClass(AccountSummary.class).addAnnotatedClass(Customer.class)
+                    .addAnnotatedClass(User.class).addAnnotatedClass(Department.class)
+                    .buildSessionFactory(
+                            new StandardServiceRegistryBuilder().build());
         } catch (Throwable ex) {
             LOGGER.error("Initial SessionFactory creation failed." + ex);
             LOGGER.error(ex.getMessage(), ex);

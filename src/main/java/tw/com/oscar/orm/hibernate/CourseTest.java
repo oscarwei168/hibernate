@@ -15,6 +15,8 @@ package tw.com.oscar.orm.hibernate;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Example;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.stat.EntityStatistics;
 import org.hibernate.stat.Statistics;
 import org.jboss.logging.Logger;
@@ -99,16 +101,16 @@ public class CourseTest {
 
     private static void test2(Session session, Long pid) {
         Course course = (Course) session.get(Course.class, pid);
-        session.delete(course); // 開錯課
+//        session.delete(course); // 開錯課
 
-//        Student student = new Student();
-//        student.setName("oscar");
-//        Example example = Example.create(student).ignoreCase().enableLike(MatchMode.ANYWHERE);
-//        Student selectedStudent = (Student) session.createCriteria(Student.class).add(example)
-//                .uniqueResult();
-//        course.getStudents().remove(selectedStudent); // 學生退選
-//
-//        session.delete(selectedStudent); // 學生休學
+        Student student = new Student();
+        student.setName("oscar");
+        Example example = Example.create(student).ignoreCase().enableLike(MatchMode.ANYWHERE);
+        Student selectedStudent = (Student) session.createCriteria(Student.class).add(example)
+                .uniqueResult();
+        course.getStudents().remove(selectedStudent); // 學生退選
+
+        session.delete(selectedStudent); // 學生休學
 
     }
 

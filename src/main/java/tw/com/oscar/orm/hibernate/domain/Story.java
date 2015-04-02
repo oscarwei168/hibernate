@@ -44,10 +44,10 @@ public class Story extends BaseEntity {
         this.name = name;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // mappedBy = "story"
-    @JoinColumn(name = "PID_STORY",
-            foreignKey = @ForeignKey(name = "FK_STORY_STORYITEM")) // uncomment when 1:N(B)
-    @org.hibernate.annotations.ForeignKey(name = "FK_STORY_STORYITEM") // uncomment when 1:N(B)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "story") // mappedBy = "story"
+//    @JoinColumn(name = "PID_STORY",
+//            foreignKey = @ForeignKey(name = "FK_STORY_STORYITEM")) // uncomment when 1:N(B)
+//    @org.hibernate.annotations.ForeignKey(name = "FK_STORY_STORYITEM") // uncomment when 1:N(B)
     @Fetch(FetchMode.SELECT) // by default
 //    @Fetch(FetchMode.JOIN) // disable lazy-loading
 //    @BatchSize(size = 5)

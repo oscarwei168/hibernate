@@ -29,7 +29,7 @@ public class StoryItem extends BaseEntity {
 
     private String name;
 
-//    private Story story;
+    private Story story;
 
     public StoryItem() {
     }
@@ -48,16 +48,16 @@ public class StoryItem extends BaseEntity {
         this.name = name;
     }
 
-//    @ManyToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "PID_STORY", nullable = false)
-//    @org.hibernate.annotations.ForeignKey(name = "FK_STORYITEM_STORY")
-//    public Story getStory() {
-//        return story;
-//    }
-//
-//    public void setStory(Story story) {
-//        this.story = story;
-//    }
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "PID_STORY", nullable = false)
+    @org.hibernate.annotations.ForeignKey(name = "FK_STORYITEM_STORY")
+    public Story getStory() {
+        return story;
+    }
+
+    public void setStory(Story story) {
+        this.story = story;
+    }
 
     @Override
     public boolean equals(Object o) {

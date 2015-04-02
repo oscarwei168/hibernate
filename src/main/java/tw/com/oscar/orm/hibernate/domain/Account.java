@@ -85,7 +85,7 @@ public class Account extends VersionEntity {
 //    private Set<Children> childrens;
     private Address homeAddress; // Embedded objects(aka component)
     private Address workAddress;
-    private Credit credit; // 1:1
+    private Credit credit; // 1:1~
     private Set<Role> roles = new HashSet<>(); // N:M
     private List<ToDo> toDoSet = new LinkedList<>(); // 1:N(B)(INX)
 
