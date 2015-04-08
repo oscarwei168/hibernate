@@ -95,17 +95,22 @@ public class HibernateTest {
             assert isContain : "WRONG REFERENCE???";
 
             // update() and merge() examples
-//            role3.setDescription("Xxxxx"); // state?
-//
-//            session = HibernateUtil.getSessionFactory().getCurrentSession();
-//            tx = session.beginTransaction();
-//            Role role4 = testCache2(session, pid);
-//            role4.setDescription("Yyyyyy");
-//            session.update(role3);
-////            session.merge(role3);
-//            tx.commit();
-//            statistics.clear();
+            role3.setDescription("Xxxxx"); // state?
 
+            session = HibernateUtil.getSessionFactory().getCurrentSession();
+            tx = session.beginTransaction();
+            Role role4 = testCache2(session, pid);
+            role4.setDescription("Yyyyyy");
+//            session.update(role3);
+            Role role5 = (Role) session.merge(role3);
+            LOGGER.info(session.contains(role3)); // role3 is detached
+            LOGGER.info(session.contains(role4));
+            LOGGER.info(session.contains(role5)); // role5 is persist
+            LOGGER.info(session.isDirty());
+            session.refresh(role3);
+            LOGGER.info(session.contains(role3));
+            tx.commit();
+            statistics.clear();
             // Composition-id searching
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
@@ -158,8 +163,8 @@ public class HibernateTest {
             // Full-Text searching example
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-//            testFullText(session);
-            tx.commit();
+            testFullText(session);
+//            tx.commit();
             statistics.clear();
 
         } catch (Exception e) {

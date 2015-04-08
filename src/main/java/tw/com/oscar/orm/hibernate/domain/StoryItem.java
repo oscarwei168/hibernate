@@ -13,6 +13,9 @@
  */
 package tw.com.oscar.orm.hibernate.domain;
 
+import tw.com.oscar.orm.hibernate.domain.enums.Priority;
+import tw.com.oscar.orm.hibernate.domain.enums.Status;
+
 import javax.persistence.*;
 
 /**
@@ -28,6 +31,8 @@ import javax.persistence.*;
 public class StoryItem extends BaseEntity {
 
     private String name;
+    private Priority priority = Priority.NORMAL;
+    private Status status = Status.TO_DO;
 
     private Story story;
 
@@ -48,6 +53,26 @@ public class StoryItem extends BaseEntity {
         this.name = name;
     }
 
+    @Column(name = "PRIORITY", nullable = false)
+    @Enumerated
+    public Priority getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
+    }
+
+    @Column(name = "STATUS")
+    @Enumerated
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "PID_STORY", nullable = false)
     @org.hibernate.annotations.ForeignKey(name = "FK_STORYITEM_STORY")
@@ -66,12 +91,26 @@ public class StoryItem extends BaseEntity {
 
         StoryItem storyItem = (StoryItem) o;
 
-        return !(name != null ? !name.equals(storyItem.name) : storyItem.name != null);
+        if (getName() != null ? !getName().equals(storyItem.getName()) : storyItem.getName() != null) return false;
+        if (getPriority() != storyItem.getPriority()) return false;
+        return getStatus() == storyItem.getStatus();
 
     }
 
     @Override
     public int hashCode() {
-        return name != null ? name.hashCode() : 0;
+        int result = getName() != null ? getName().hashCode() : 0;
+        result = 31 * result + (getPriority() != null ? getPriority().hashCode() : 0);
+        result = 31 * result + (getStatus() != null ? getStatus().hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "StoryItem{" +
+                "status=" + status +
+                ", priority=" + priority +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

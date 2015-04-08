@@ -44,7 +44,7 @@ public class HibernateUtil {
 
             return new Configuration().configure().setInterceptor(new AuditInterceptor())
                     .addPackage("tw.com.oscar.orm.hibernate.domain")
-                    .addAnnotatedClass(Account.class)
+                    .addAnnotatedClass(Account.class).addAnnotatedClass(Story.class).addAnnotatedClass(StoryItem.class)
                     .addAnnotatedClass(Role.class).addAnnotatedClass(Address.class)
                     .addAnnotatedClass(ToDo.class).addAnnotatedClass(Credit.class)
                     .addAnnotatedClass(Company.class)

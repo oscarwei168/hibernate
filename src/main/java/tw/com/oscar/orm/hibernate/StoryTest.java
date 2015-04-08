@@ -15,6 +15,7 @@ package tw.com.oscar.orm.hibernate;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Example;
 import org.hibernate.stat.EntityStatistics;
 import org.hibernate.stat.Statistics;
 import org.jboss.logging.Logger;
@@ -22,9 +23,10 @@ import tw.com.oscar.orm.hibernate.domain.Story;
 import tw.com.oscar.orm.hibernate.domain.StoryItem;
 import tw.com.oscar.orm.hibernate.util.HibernateUtil;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.joining;
 
 /**
  * <strong>Description:</strong><br>
@@ -60,20 +62,20 @@ public class StoryTest {
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
             HibernateUtil.getSessionFactory().getCache().evictEntity(Story.class, 1L);
-//            test2(session);
+            test2(session);
             tx.commit();
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
             HibernateUtil.getSessionFactory().getCache().evictEntity(Story.class, 1L);
-//            prepareData(session);
+            prepareData(session);
             tx.commit();
 
             // FetchMode examples
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
             HibernateUtil.getSessionFactory().getCache().evictEntity(Story.class, 1L);
-//            test3(session);
+            test3(session);
             tx.commit();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -133,56 +135,59 @@ public class StoryTest {
 
     }
 
-//    private static void test2(Session session) throws Exception {
-//        Story story = (Story) session.load(Story.class, 1L); // TODO get() vs load()
-//        if (null != story) {
-//            Set<StoryItem> storyItems = story.getStoryItems();
-//            LOGGER.info("Items : " + storyItems.stream().map(StoryItem::getName).distinct()
-//                    .sorted().collect(joining(", ")));
-//        }
-//
-//    }
+    private static void test2(Session session) throws Exception {
+        Story story = (Story) session.load(Story.class, 1L); // TODO get() vs load()
+        if (null != story) {
+            Stream<StoryItem> storyItems = story.getStoryItems().stream();
+            LOGGER.info("Items : " + storyItems
+                    .sorted((item1, item2) -> item1.getPriority().compareTo(item2.getPriority()))
+                    .map(StoryItem::getName).distinct()
+                    .collect(joining(", ")));
+        }
 
-//    private static void test3(Session session) {
-//        Example example = Example.create(new Story()).excludeZeroes().ignoreCase();
-//        List<Story> storys = session.createCriteria(Story.class).add(example).list();
-//
-//        for (Story story : storys) {
-//            LOGGER.info(story.getName());
-//            Set<StoryItem> items = story.getStoryItems();
-//            for (Iterator<StoryItem> iters = items.iterator(); iters.hasNext(); ) {
-//                StoryItem item = iters.next();
-//                LOGGER.info(item.getName());
-//            }
-//
-//        }
-//    }
+    }
 
-//    private static void prepareData(Session session) {
-//
-//        for (int i = 1; i <= 10; i++) {
-//            Story story = new Story("Story " + i);
-//            story.setUserCreated(ADMIN);
-//            story.setDateCreated(new Date());
-//
-//            for (int j = 1; j <= 2; j++) {
-//                StoryItem item = new StoryItem("Item " + i + j);
-//                item.setUserCreated(ADMIN);
-//                item.setDateCreated(new Date());
-//                add(story, item);
-//
-//            }
-//
-//            session.save(story);
-//        }
-//
-//    }
-//
-//    private static void add(Story story, StoryItem storyItem) {
-//        if (null == story.getStoryItems()) {
-//            story.setStoryItems(new HashSet<>());
-//        }
-//        story.getStoryItems().add(storyItem);
-//    }
+    private static void test3(Session session) {
+        Example example = Example.create(new Story()).excludeZeroes().ignoreCase().excludeProperty("status");
+        List<Story> storys = session.createCriteria(Story.class).add(example).list();
+
+        for (Story story : storys) {
+            LOGGER.info(story.getName());
+            Set<StoryItem> items = story.getStoryItems();
+            for (Iterator<StoryItem> iters = items.iterator(); iters.hasNext(); ) {
+                StoryItem item = iters.next();
+                LOGGER.info(item.getName());
+            }
+
+        }
+    }
+
+    private static void prepareData(Session session) {
+
+        for (int i = 1; i <= 11; i++) {
+            Story story = new Story("Story " + i);
+            story.setUserCreated(ADMIN);
+            story.setDateCreated(new Date());
+
+            for (int j = 1; j <= 2; j++) {
+                StoryItem item = new StoryItem("Item " + i + j);
+                item.setUserCreated(ADMIN);
+                item.setDateCreated(new Date());
+                add(story, item);
+
+            }
+
+            session.save(story);
+        }
+
+    }
+
+    private static void add(Story story, StoryItem storyItem) {
+        if (null == story.getStoryItems()) {
+            story.setStoryItems(new HashSet<>());
+        }
+        story.getStoryItems().add(storyItem);
+        storyItem.setStory(story);
+    }
 
 }

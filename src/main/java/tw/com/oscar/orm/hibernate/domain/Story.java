@@ -15,6 +15,7 @@ package tw.com.oscar.orm.hibernate.domain;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import tw.com.oscar.orm.hibernate.domain.enums.Status;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -29,11 +30,14 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "STORY",
-        uniqueConstraints = @UniqueConstraint(name = "UK_NAME", columnNames = { "NAME" }))
+        uniqueConstraints = @UniqueConstraint(name = "UK_NAME", columnNames = {"NAME"}))
 @Access(AccessType.PROPERTY)
+//@Proxy
 public class Story extends BaseEntity {
 
     private String name;
+    private String description;
+    private Status status = Status.NEW;
 
     private Set<StoryItem> storyItems;
 
@@ -44,14 +48,14 @@ public class Story extends BaseEntity {
         this.name = name;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "story") // mappedBy = "story"
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "story")
 //    @JoinColumn(name = "PID_STORY",
 //            foreignKey = @ForeignKey(name = "FK_STORY_STORYITEM")) // uncomment when 1:N(B)
 //    @org.hibernate.annotations.ForeignKey(name = "FK_STORY_STORYITEM") // uncomment when 1:N(B)
-    @Fetch(FetchMode.SELECT) // by default
+//    @Fetch(FetchMode.SELECT) // by default
 //    @Fetch(FetchMode.JOIN) // disable lazy-loading
 //    @BatchSize(size = 5)
-//    @Fetch(FetchMode.SUBSELECT)
+    @Fetch(FetchMode.SUBSELECT)
     public Set<StoryItem> getStoryItems() {
         return storyItems;
     }
@@ -69,6 +73,25 @@ public class Story extends BaseEntity {
         this.name = name;
     }
 
+    @Column(name = "DESCRIPTION", length = 100)
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Column(name = "STATUS", nullable = false)
+    @Enumerated
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -76,12 +99,24 @@ public class Story extends BaseEntity {
 
         Story story = (Story) o;
 
-        return !(name != null ? !name.equals(story.name) : story.name != null);
+        if (getName() != null ? !getName().equals(story.getName()) : story.getName() != null) return false;
+        return getStatus() == story.getStatus();
 
     }
 
     @Override
     public int hashCode() {
-        return name != null ? name.hashCode() : 0;
+        int result = getName() != null ? getName().hashCode() : 0;
+        result = 31 * result + (getStatus() != null ? getStatus().hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Story{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                '}';
     }
 }

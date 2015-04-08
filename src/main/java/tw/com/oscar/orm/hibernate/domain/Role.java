@@ -15,7 +15,6 @@ package tw.com.oscar.orm.hibernate.domain;
 
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -48,7 +47,7 @@ public class Role extends BaseEntity {
     }
 
     @Column(name = "ROLE_NAME", nullable = false, length = 45, unique = true)
-    @NaturalId
+//    @NaturalId
     public String getRoleName() {
         return roleName;
     }
