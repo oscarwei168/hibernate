@@ -33,6 +33,7 @@ public class StoryItem extends BaseEntity {
     private String name;
     private Priority priority = Priority.NORMAL;
     private Status status = Status.TO_DO;
+    private int delay;
 
     private Story story;
 
@@ -71,6 +72,15 @@ public class StoryItem extends BaseEntity {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    @Column(name = "DELAY")
+    public int getDelay() {
+        return delay;
+    }
+
+    public void setDelay(int delay) {
+        this.delay = delay;
     }
 
     @ManyToOne(cascade = CascadeType.ALL)

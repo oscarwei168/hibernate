@@ -59,7 +59,7 @@ public class HibernateTest {
             // Normal insert
             Session session = HibernateUtil.getSessionFactory().getCurrentSession();
             Transaction tx = session.beginTransaction();
-            Long pid = testCase1(session);
+//            Long pid = testCase1(session);
             tx.commit();
             EntityStatistics roleStatic = statistics.getEntityStatistics(Role.class.getName());
             LOGGER.info("InsertCount : " + roleStatic.getInsertCount());
@@ -68,17 +68,17 @@ public class HibernateTest {
             // Dynamic insert/update testing
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-            Role role = testCase2(session, pid);
+//            Role role = testCase2(session, pid);
             tx.commit();
             LOGGER.info("UpdateCount : " + roleStatic.getUpdateCount());
             statistics.clear();
 
             // same-session cache testing
             session = HibernateUtil.getSessionFactory().getCurrentSession();
-            HibernateUtil.getSessionFactory().getCache().evictEntity(Role.class, pid);
+//            HibernateUtil.getSessionFactory().getCache().evictEntity(Role.class, pid);
             tx = session.beginTransaction();
 //            session.setCacheMode(CacheMode.PUT);
-            List<Role> roles = testCache1(session, pid); // comment class-level cache setting
+//            List<Role> roles = testCache1(session, pid); // comment class-level cache setting
             tx.commit();
             statistics.clear();
 
@@ -87,42 +87,42 @@ public class HibernateTest {
             tx = session.beginTransaction();
 //            HibernateUtil.getSessionFactory().getCache().evictEntity(Role.class, pid);
 //            session.setCacheMode(CacheMode.NORMAL); // default cache mode
-            Role role3 = testCache2(session, pid); // uncomment class-level cache setting
+//            Role role3 = testCache2(session, pid); // uncomment class-level cache setting
             tx.commit();
             statistics.clear();
 
-            boolean isContain = roles.contains(role3);
-            assert isContain : "WRONG REFERENCE???";
+//            boolean isContain = roles.contains(role3);
+//            assert isContain : "WRONG REFERENCE???";
 
             // update() and merge() examples
-            role3.setDescription("Xxxxx"); // state?
+//            role3.setDescription("Xxxxx"); // state?
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-            Role role4 = testCache2(session, pid);
-            role4.setDescription("Yyyyyy");
+//            Role role4 = testCache2(session, pid);
+//            role4.setDescription("Yyyyyy");
 //            session.update(role3);
-            Role role5 = (Role) session.merge(role3);
-            LOGGER.info(session.contains(role3)); // role3 is detached
-            LOGGER.info(session.contains(role4));
-            LOGGER.info(session.contains(role5)); // role5 is persist
-            LOGGER.info(session.isDirty());
-            session.refresh(role3);
-            LOGGER.info(session.contains(role3));
-            tx.commit();
-            statistics.clear();
+//            Role role5 = (Role) session.merge(role3);
+//            LOGGER.info(session.contains(role3)); // role3 is detached
+//            LOGGER.info(session.contains(role4));
+//            LOGGER.info(session.contains(role5)); // role5 is persist
+//            LOGGER.info(session.isDirty());
+//            session.refresh(role3);
+//            LOGGER.info(session.contains(role3));
+//            tx.commit();
+//            statistics.clear();
             // Composition-id searching
-            session = HibernateUtil.getSessionFactory().getCurrentSession();
-            tx = session.beginTransaction();
+//            session = HibernateUtil.getSessionFactory().getCurrentSession();
+//            tx = session.beginTransaction();
 //            CompanyId companyId = new CompanyId("EMEA", "0001");
 //            Company company = (Company) session.get(Company.class, companyId);
 //            LOGGER.info("Desc : " + company.getDescription());
             tx.commit();
-            statistics.clear();
+//            statistics.clear();
 
             session = HibernateUtil.getSessionFactory().getCurrentSession();
             tx = session.beginTransaction();
-//            Credit credit = createCredit(session);
+            Credit credit = createCredit(session);
 //            session.delete(role); // TODO
             tx.commit();
             statistics.clear();
@@ -362,7 +362,8 @@ public class HibernateTest {
         credit.setDescription("A normal credit...");
         credit.setUserCreated(ADMIN);
         credit.setDateCreated(new Date());
-        session.persist(credit);
+        long id = (Long) session.save(credit);
+//        session.persist(credit);
         return credit;
     }
 

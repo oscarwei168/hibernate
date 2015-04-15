@@ -48,6 +48,11 @@ public class Story extends BaseEntity {
         this.name = name;
     }
 
+    public Story(String name, Status status) {
+        this.name = name;
+        this.status = status;
+    }
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "story")
 //    @JoinColumn(name = "PID_STORY",
 //            foreignKey = @ForeignKey(name = "FK_STORY_STORYITEM")) // uncomment when 1:N(B)
