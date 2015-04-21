@@ -1,7 +1,7 @@
 /**
  * Title: Acer Internal Project
  * Copyright: (c) 2015, Acer Inc.
- * Name: Employee
+ * Name: OutsourcingStaff
  *
  * @author Oscar Wei
  * @since 2015/3/31

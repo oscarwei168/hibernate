@@ -83,7 +83,7 @@ public class StoryTest {
             if (null != statistics) {
                 statistics.setStatisticsEnabled(false);
             }
-//            HibernateUtil.getSessionFactory().close();
+            HibernateUtil.getSessionFactory().close();
             LOGGER.info("Hibernate session is closed");
         }
 

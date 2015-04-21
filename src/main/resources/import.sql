@@ -1,6 +1,6 @@
 # INSERT INTO sys_param VALUES(1, CURRENT_DATE, NULL, "DTS", NULL, "XX");
 
-INSERT INTO company VALUES ("0001", "EMEA", "Oscar Wei EMEA region");
+# INSERT INTO company VALUES ("0001", "EMEA", "Oscar Wei EMEA region");
 
 INSERT INTO story (PID, NAME, DESCRIPTION, STATUS, USER_CREATED, DATE_CREATED)
 VALUES (1, "Story 1", "Story 1 desc", 0, "DTS.Admin", CURRENT_TIMESTAMP);
