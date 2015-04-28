@@ -22,10 +22,8 @@ public class OptionalSample {
         Optional<String> mayHasSomething = Optional.ofNullable(null); // Optional.empty
 
         // Obtaining value in the Optional class
-        Optional<Integer> len = hasSomething.map(String::length);
-        System.out.println("String length : " + len.get());
         System.out.println(empty.orElse("Unknown..."));
-        System.out.println(hasSomething.orElseGet(() -> {
+        System.out.println(mayHasSomething.orElseGet(() -> {
             String s = "functional-style programming...";
             return s;
         }));
@@ -33,12 +31,11 @@ public class OptionalSample {
 
         // Checking Optional class
         System.out.println(hasSomething.isPresent());
-        hasSomething.ifPresent(e -> System.out.println("" + e));
+        hasSomething.ifPresent(System.out::println);
 
         // Processing Optional class
-        hasSomething.filter(e -> e.contains("o")).ifPresent(e -> System.out.println("" + e));
-        hasSomething.map(String::trim).filter(e -> e.length() > 1).ifPresent(e -> System.out
-                .println("" + e));
+        hasSomething.filter(e -> e.contains("o")).ifPresent(System.out::println);
+        hasSomething.map(String::trim).filter(e -> e.length() > 1).ifPresent(System.out::println);
 
         // Some Optional class examples
         hasSomething.map(String::trim).orElse("");
@@ -48,20 +45,21 @@ public class OptionalSample {
         OptionalInt xx = OptionalInt.of(10);
         System.out.println("OptionalInt : " + xx.getAsInt());
 
+
         System.out.println("--------------------------------------");
         Function<String, OutsourcingCompany> companyFunction = OutsourcingCompany::new;
         OutsourcingCompany unknownCompany = companyFunction.apply("Unknown");
 
         BiFunction<String, String, Person> personFunction = Person::new;
-        Person unknownPerson = personFunction.apply("Unknown", "Unknown description...");
+        Person unknownPerson = personFunction.apply("Unknown", "Who are you...");
 
         OutsourcingStaff oscar = genStaff("Oscar Wei");
         OutsourcingCompany company = oscar.getCompany().get();
         System.out.println("Company : " + company.getName());
         Person boss = company.getBoss();
         System.out.println("Boss : " + boss.getName());
-        Person assistant = company.getAssistant().get();
-//        Person assistant = company.getAssistant().orElse(unknownPerson);
+//        Person assistant = company.getAssistant().get();
+        Person assistant = company.getAssistant().orElse(unknownPerson);
         System.out.println("Assistant(1) : " + assistant.getName());
 
         // map()/flatMap() example
@@ -79,8 +77,8 @@ public class OptionalSample {
         OutsourcingCompany techLink = new OutsourcingCompany("Tech Link Inc.");
         Person amy = new Person("Amy", "My boss...");
         techLink.setBoss(amy);
-        Person baby = new Person("Megan Fox", "My little-3...");
-        techLink.setAssistant(Optional.of(baby));
+//        Person baby = new Person("Megan Fox", "My little-3...");
+//        techLink.setAssistant(Optional.of(baby));
         staff.setCompany(Optional.of(techLink));
         return staff;
     }

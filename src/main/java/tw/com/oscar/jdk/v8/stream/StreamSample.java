@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tw.com.oscar.orm.hibernate.domain.Story;
 import tw.com.oscar.orm.hibernate.domain.StoryItem;
-import tw.com.oscar.orm.hibernate.domain.enums.Status;
 import tw.com.oscar.orm.hibernate.util.HibernateUtil;
 
 import java.io.IOException;
@@ -94,7 +93,7 @@ public class StreamSample {
             Stream<StoryItem> itemStream = story.getStoryItems().stream();
 
             // Obtaining all names that delay 3 days, sorting by delay
-//            List<StoryItem> items = itemStream.collect(toList());
+            List<StoryItem> items = itemStream.collect(toList());
 //            items = over3DayDelay(items);
 //            Collections.sort(items, new Comparator<StoryItem>() {
 //
@@ -115,14 +114,14 @@ public class StreamSample {
 //                    .collect(joining(", ")));
 
             // Match examples
-//            boolean isAnyMatch = itemStream
-//                    .anyMatch(item -> 3 < item.getDelay());
-//            LOGGER.info("isAnyMatch : " + isAnyMatch);
-
+            boolean isAnyMatch = itemStream
+                    .anyMatch(item -> 3 < item.getDelay());
+            LOGGER.info("isAnyMatch : " + isAnyMatch);
+//
 //            boolean isAllMatch = itemStream
 //                    .allMatch(item -> Status.COMPLETED == item.getStatus());
 //            LOGGER.info("isAllMatch : " + isAllMatch);
-
+//
 //            boolean isNoneMatch = itemStream
 //                    .noneMatch(item -> {
 //                        LOGGER.info(item.getName() + " : " + item.getPriority().name());
@@ -130,12 +129,12 @@ public class StreamSample {
 //                    });
 //            LOGGER.info("isNoneMatch : " + isNoneMatch);
 
-            Optional<StoryItem> findAny = itemStream
-                    .filter(item -> {
-                        System.out.println("Item name : " + item.getName() + ":" + item.getStatus().name());
-                        return Status.TO_DO == item.getStatus();
-                    })
-                    .findAny();
+//            Optional<StoryItem> findAny = itemStream
+//                    .filter(item -> {
+//                        System.out.println("Item name : " + item.getName() + ":" + item.getStatus().name());
+//                        return Status.TO_DO == item.getStatus();
+//                    })
+//                    .findAny();
 //            StoryItem item = findAny.orElse(new StoryItem());
 //            StoryItem item = findAny.orElseGet(() -> new StoryItem("Nothing"));
 //            StoryItem item = findAny.orElseThrow(() -> new Exception("Error..."));

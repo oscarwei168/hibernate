@@ -13,6 +13,7 @@
  */
 package tw.com.oscar.jdk.v8.optional.model;
 
+import java.io.Serializable;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -24,7 +25,7 @@ import java.util.stream.Stream;
  * @version v1, 2015/4/15
  * @since 2015/4/15
  */
-public class OutsourcingCompany {
+public class OutsourcingCompany implements Serializable {
 
     private String name;
     private Person boss;
