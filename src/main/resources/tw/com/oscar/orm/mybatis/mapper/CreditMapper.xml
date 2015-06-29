@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tw.com.oscar.orm.mybatis.mapper.CreditMapper">
+
+    <sql id="commonColumns">NAME, DESCRIPTION, CREDIT_CARD_TYPE</sql>
+    <sql id="createdColumns">USER_CREATED, DATE_CREATED</sql>
+    <sql id="lastModifiedColumns">USER_LAST_MODIFIED, DATE_LAST_MODIFIED</sql>
+
+    <select id="selectAllCredit" resultType="Credit" fetchSize="10">
+        SELECT * FROM CREDIT
+    </select>
+
+    <select id="selectCredit" parameterType="long" resultType="Credit" flushCache="false" useCache="true"
+            statementType="PREPARED" fetchSize="10">
+        SELECT * FROM CREDIT WHERE PID = #{pid}
+    </select>
+
+    <insert id="insertCredit" parameterType="Credit" flushCache="true" statementType="PREPARED"
+            useGeneratedKeys="true" keyProperty="PID">
+        INSERT INTO CREDIT(<include refid="commonColumns"/>,<include refid="createdColumns"/>)
+        VALUES (#{name,javaType=string,jdbcType=VARCHAR}, #{description},
+        #{creditCardType,javaType=string,jdbcType=VARCHAR,typeHandler=org.apache.ibatis.type.EnumTypeHandler},'DTS',CURRENT_TIME)
+    </insert>
+
+    <delete id="deleteCredit" parameterType="int">
+        DELETE FROM CREDIT WHERE PID = ${pid}
+    </delete>
+
+</mapper>
