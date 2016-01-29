@@ -1,9 +1,12 @@
 package tw.com.oscar.guava.ordering;
 
 import com.google.common.base.Function;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
+import com.google.common.primitives.Ints;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
@@ -30,29 +33,50 @@ public class OrderingTest {
 
         Ordering<Person> naturalOrdering = Ordering.natural();
 
-        Ordering<Person> aComparator = Ordering.from(firstNameComparator);
+        Ordering<Person> aComparator = Ordering.from(firstNameComparator); // generate Ordering by exist comparator
         List<Person> sortedPersons = aComparator.nullsLast().sortedCopy(persons);
         System.out.println(sortedPersons);
 
+        // read from left to right
         Ordering<Person> aComparator1 = Ordering.from(lastNameComparator).compound(birthYearComparator).reverse();
         System.out.println(aComparator1.nullsFirst().sortedCopy(persons));
 
-        Ordering ordering = Ordering.natural().reverse().nullsFirst().onResultOf(new Function<Person, Integer>() {
+        Ordering<Person> byPersonBirthYear = new Ordering<Person>() {
+
+            @Override
+            public int compare(Person left, Person right) {
+                return Ints.compare(left.getBirthYear(), right.getBirthYear());
+            }
+        };
+
+        // read from right to left
+        Ordering ordering = Ordering.natural().reverse().nullsLast().onResultOf(new Function<Person, Integer>() {
+
             @Override
             public Integer apply(Person s) {
                 return null != s ? s.getFirstname().length() : null;
             }
         });
-
         Collections.sort(persons, ordering);
         System.out.println(persons);
 
+        List<Person> greatest = ordering.greatestOf(persons, 2); // obtain first 2 person
+        System.out.println(greatest.size());
+        System.out.println(greatest.get(0));
+
+        List<Person> leastOf = ordering.leastOf(persons, 3); // obtain last 2 person
+        System.out.println(leastOf.size());
+        System.out.println(leastOf.get(0));
+
         List<Colors> colors = Lists.newArrayList(Colors.BLUE, Colors.WHITE, Colors.BLACK, Colors.YELLOW);
+        // follow explicit ordering as arguments
         Ordering<Colors> explicit = Ordering.explicit(Colors.BLACK, Colors.WHITE, Colors.YELLOW, Colors.BLUE);
         List<Colors> sortedColors = explicit.sortedCopy(colors);
         System.out.println(sortedColors);
 
-        Ordering<Object> toStringOrdering = Ordering.usingToString();
+        ImmutableList<Colors> immutableList = explicit.immutableSortedCopy(colors);
+
+        Ordering<Object> toStringOrdering = Ordering.usingToString(); // compared according to object toString() method
         sortedPersons = toStringOrdering.nullsFirst().sortedCopy(persons);
         System.out.println(sortedPersons);
 
@@ -123,11 +147,8 @@ public class OrderingTest {
 
         @Override
         public String toString() {
-            return "Person{" +
-                    "firstname='" + firstname + '\'' +
-                    ", lastname='" + lastname + '\'' +
-                    ", birthYear=" + birthYear +
-                    '}';
+            return MoreObjects.toStringHelper(this).add("FirstName", this.getFirstname()).add("LastName", this
+                    .getLastname()).add("Birthday", this.getBirthYear()).toString();
         }
     }
 }

@@ -1,6 +1,7 @@
 package tw.com.oscar.guava.predicate;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 
 import java.util.regex.Pattern;
@@ -19,6 +20,7 @@ import static tw.com.oscar.guava.predicate.PredicateTest.ShorterStringPredicate.
 public class PredicateTest {
 
     private static final Predicate<String> NULL_OR_EMPTY = Strings::isNullOrEmpty;
+    private static final Predicate<String> IS_NOT_BLANK = Predicates.notNull();
 
     private static final Pattern LETTERS_AND_NUMBERS = Pattern.compile("^[0-9A-Z]*[A-Z]+[0-9]+[0-9A-Z]*$");
     private static final Predicate<String> ARE_LETTERS_AND_NUMBERS = matching(LETTERS_AND_NUMBERS);
