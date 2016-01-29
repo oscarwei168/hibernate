@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasources>
+	<datasource id="DEFAULT_DB">
+		<jdbc-driver>oracle.jdbc.driver.OracleDriver</jdbc-driver>
+		<hosts>
+			<host>10.36.8.236</host>
+		</hosts>
+		<port>1521</port>
+		<service-name>d1portal</service-name>
+		<user-name>ds_user_ap</user-name>
+		<password>ds</password>
+	</datasource>
+	<datasource id="PORTAL_DB">
+		<jdbc-driver>oracle.jdbc.driver.OracleDriver</jdbc-driver>
+		<hosts>
+			<host>10.36.8.236</host>
+		</hosts>
+		<port>1521</port>
+		<service-name>d1portal</service-name>
+		<user-name>ds_user_ap</user-name>
+		<password>ds</password>
+	</datasource>
+	<datasource id="AGILE_DB">
+		<jdbc-driver>oracle.jdbc.driver.OracleDriver</jdbc-driver>
+		<hosts>
+			<host>10.36.4.93</host>
+			<host>10.36.4.93</host>
+		</hosts>
+		<port>1521</port>
+		<service-name>agiledev</service-name>
+		<user-name>agile</user-name>
+		<password>tartan</password>
+	</datasource>
+	<datasource id="SPL_DB">
+		<jdbc-driver>oracle.jdbc.driver.OracleDriver</jdbc-driver>
+		<hosts>
+			<host>10.36.21.211</host>
+		</hosts>
+		<port>1521</port>
+		<service-name>gcsd</service-name>
+		<user-name>spl_user_ap</user-name>
+		<password>splap</password>
+	</datasource>
+	<datasource id="SECOND_DB">
+		<jdbc-driver>oracle.jdbc.driver.OracleDriver</jdbc-driver>
+		<hosts>
+			<host>10.36.0.238</host>
+			<host>10.36.0.239</host>
+		</hosts>
+		<port>1521</port>
+		<service-name>tstint</service-name>
+		<user-name>rpt_user</user-name>
+		<password>RPTUSER</password>
+	</datasource>
+                <datasource id="PLM_SA_SDB">
+		<jdbc-driver>oracle.jdbc.driver.OracleDriver</jdbc-driver>
+		<hosts>
+			<host>10.36.8.248</host>
+			<host>10.36.8.249</host>
+		</hosts>
+		<port>1521</port>
+		<service-name>tst1int</service-name>
+		<user-name>plm_sa</user-name>
+		<password>plmsa</password>
+	</datasource>
+	<datasource id="APC_PLUS_DB">
+		<jdbc-driver>oracle.jdbc.driver.OracleDriver</jdbc-driver>
+		<hosts>
+			<host>10.36.8.187</host>
+		</hosts>
+		<port>1521</port>
+		<service-name>TST3DS</service-name>
+		<user-name>svr</user-name>
+		<password>svr</password>
+	</datasource>
+	<datasource id="APS_DB">
+		<jdbc-driver>oracle.jdbc.driver.OracleDriver</jdbc-driver>
+		<hosts>
+			<host>10.36.8.236</host>
+		</hosts>
+		<port>1521</port>
+		<service-name>d1portal</service-name>
+		<user-name>aps_user_ap</user-name>
+		<password>aps</password>
+	</datasource>
+	<!-- PLM_Integraction-->
+	<datasource id="DATABASE_6">
+		<jdbc-driver>oracle.jdbc.driver.OracleDriver</jdbc-driver>
+		<hosts>
+			<host>10.36.8.248</host>
+			<host>10.36.8.249</host>
+		</hosts>
+		<port>1521</port>
+		<service-name>tst1int</service-name>
+		<user-name>IB_ADM</user-name>
+		<password>ibadm164</password>
+	</datasource>
+	<datasource id="PLM_DS_USER_INTERFACEDB">
+			<jdbc-driver>oracle.jdbc.driver.OracleDriver</jdbc-driver>
+		<hosts>
+			<host>10.36.0.238</host>
+			<host>10.36.0.239</host>
+		</hosts>
+		<port>1521</port>
+		<service-name>tstint</service-name>
+		<user-name>ds_user_ap</user-name>
+		<password>dsuserap</password>
+	</datasource>
+</datasources>
