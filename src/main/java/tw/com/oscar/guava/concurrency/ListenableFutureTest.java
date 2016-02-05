@@ -12,6 +12,7 @@
  */
 package tw.com.oscar.guava.concurrency;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.*;
@@ -40,41 +41,71 @@ import java.util.concurrent.*;
 public class ListenableFutureTest {
 
     private static final int MAX_SIZE = 10;
-    private List<String> list = Lists.newArrayList();
     ExecutorService cachedExecutor = Executors.newCachedThreadPool();
     ExecutorService fixedExecutor = Executors.newFixedThreadPool(MAX_SIZE);
     ListeningExecutorService listeningExecutor = MoreExecutors.listeningDecorator(fixedExecutor);
+    private List<String> list = Lists.newArrayList();
 
-
-    public void addToList(String item) throws ExecutionException, InterruptedException {
+    public void addToList(final String item) throws ExecutionException, InterruptedException {
         Future<String> future = cachedExecutor.submit(new Callable<String>() {
 
             @Override
             public String call() throws Exception {
-                return "";
+                return item;
             }
         });
         String returnValue = future.get();
         list.add(returnValue);
     }
 
-    public void addToListListenableFutureVersion(String item) {
+    public void addToListListenableFutureVersion(final String item) {
         ListenableFuture<String> listenableFuture = listeningExecutor.submit(() -> "");
         listenableFuture.addListener(new Runnable() {
 
             @Override
             public void run() {
-                methodToRunOnFutureTaskCompletion();
+                methodToRunOnFutureTaskCompletion(item);
             }
         }, listeningExecutor);
     }
 
-    public void addToListListenableFutureWithFutureCallbackVersion(String item) {
+    public void addToListListenableFutureVersion1(final String item) {
+        ListenableFutureTask listenableFutureTask = ListenableFutureTask.create(() -> "");
+        listenableFutureTask.addListener(() -> methodToRunOnFutureTaskCompletion(item), listeningExecutor);
+    }
+
+    public String addToListListenableFutureWithFutureCallbackVersion(String item) {
         FutureCallbackImpl callback = new FutureCallbackImpl();
-        ListenableFuture<String> futureTask = listeningExecutor.submit(() -> "");
-        Futures.addCallback(futureTask, callback);
-        // Futures.addCallback(futureTask, callback, cachedExecutor);
-        callback.getCallbackResult();
+        ListenableFuture<String> futureTask = listeningExecutor.submit(() -> item.toUpperCase());
+        CheckedFuture<String, IllegalStateException> checkedFuture = Futures.makeChecked(futureTask, new Function<Exception,
+                IllegalStateException>() {
+
+            @Override
+            public IllegalStateException apply(Exception input) {
+                return new IllegalStateException(input);
+            }
+        });
+        Futures.addCallback(futureTask, callback, cachedExecutor);
+        // Futures.addCallback(futureTask, callback);
+        return callback.getCallbackResult();
+    }
+
+    public void futuresSample(List<ListenableFuture<String>> listenableFutureList) {
+        FutureCallbackImpl callback = new FutureCallbackImpl();
+        ListenableFuture<List<String>> successful = Futures.successfulAsList(listenableFutureList);
+        // ListenableFuture<List<String>> successful1 = Futures.allAsList(listenableFutureList);
+        Futures.addCallback(successful, new FutureCallback<List<String>>() {
+
+            @Override
+            public void onSuccess(List<String> result) {
+
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+
+            }
+        });
     }
 
     public void addToListSettableFutureVersion(String item) {
@@ -90,9 +121,22 @@ public class ListenableFutureTest {
     }
 
     public void FuturesTest() {
-        ListenableFuture<String> futureTask = listeningExecutor.submit(() -> "");
-        AsyncFunctionSample af = new AsyncFunctionSample();
-        // ListenableFuture<String> listenableFuture = Futures.transform(futureTask, af);
+        ListenableFuture<Long> futureTask = listeningExecutor.submit(() -> Long.parseLong(""));
+        AsyncFunction<Long, String> af = new AsyncFunctionSample();
+        ListenableFuture<String> listenableFuture = Futures.transform(futureTask, af, fixedExecutor);
+    }
+
+    public ListenableFuture convertToListenableFuture(Future future) {
+        // it is heavyweight
+        return JdkFutureAdapters.listenInPoolThread(future);
+    }
+
+    public ListenableFuture convertToListenableFuture(Future future, Executor executor) {
+        return JdkFutureAdapters.listenInPoolThread(future, executor);
+    }
+
+    private void methodToRunOnFutureTaskCompletion(String item) {
+        //
     }
 
     static class FutureCallbackImpl implements FutureCallback<String> {
@@ -150,9 +194,5 @@ public class ListenableFutureTest {
             }
             throw new Exception(t);
         }
-    }
-
-    private void methodToRunOnFutureTaskCompletion() {
-        //
     }
 }
