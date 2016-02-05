@@ -10,7 +10,7 @@
  * 2016/1/17 Oscar Wei v1
  * + File created
  */
-package tw.com.oscar.concurrency.example1;
+package tw.com.oscar.jdk.thread;
 
 /**
  * <p>
@@ -31,21 +31,10 @@ package tw.com.oscar.concurrency.example1;
  */
 public class SynchronizedTest {
 
+    private static int value1;
     // 'volatile' will put variable 'value' to the main memory, not put into the CPU cache
     // and other thread can seeing this variable
     private volatile int value;
-    private static int value1;
-
-    public synchronized void add1(int valueToAdd) {
-        this.value += valueToAdd;
-    }
-
-    public void add2(int valueToAdd) {
-        /** in here 'this' is call 'monitor object' **/
-        synchronized (this) {
-            this.value += valueToAdd;
-        }
-    }
 
     public static synchronized void add3(int valueToTimes) {
         value1 += valueToTimes;
@@ -54,6 +43,17 @@ public class SynchronizedTest {
     public static void add4(int valueToAdd) {
         synchronized (SynchronizedTest.class) {
             value1 += valueToAdd;
+        }
+    }
+
+    public synchronized void add1(int valueToAdd) {
+        this.value += valueToAdd;
+    }
+
+    public void add2(int valueToAdd) {
+        /** in here 'this' is called 'monitor object' **/
+        synchronized (this) {
+            this.value += valueToAdd;
         }
     }
 }

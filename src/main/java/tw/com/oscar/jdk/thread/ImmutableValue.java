@@ -10,7 +10,7 @@
  * 2016/1/16 Oscar Wei v1
  * + File created
  */
-package tw.com.oscar.concurrency.example1;
+package tw.com.oscar.jdk.thread;
 
 /**
  * <p>
