@@ -35,7 +35,7 @@ import java.util.List;
 public class TreeNode {
 
     TreeNode parent = null;
-    List<TreeNode> children = new ArrayList();
+    List<TreeNode> children = new ArrayList<>();
 
     public synchronized void addChild(TreeNode child) {
         if (!this.children.contains(child)) {
