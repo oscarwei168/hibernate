@@ -42,7 +42,8 @@ public class SynchronizedTest {
 
     public static void add4(int valueToAdd) {
         synchronized (SynchronizedTest.class) {
-            value1 += valueToAdd;
+            add3(valueToAdd);
+            // value1 += valueToAdd;
         }
     }
 
