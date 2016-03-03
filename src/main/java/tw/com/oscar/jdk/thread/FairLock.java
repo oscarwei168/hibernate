@@ -39,13 +39,13 @@ public class FairLock {
     private List<QueueObject> waitingThreads = new ArrayList<>();
 
     public void lock() throws InterruptedException {
-        QueueObject queueObject = new QueueObject();
+        QueueObject queueObject = new QueueObject(); // avoid missed signals
         boolean isLockedForThisThread = true;
         synchronized (this) {
             waitingThreads.add(queueObject);
         }
 
-        while (isLockedForThisThread) {
+        while (isLockedForThisThread) { // slipped conditions
             synchronized (this) {
                 isLockedForThisThread =
                         isLocked || waitingThreads.get(0) != queueObject;
