@@ -12,8 +12,11 @@
  */
 package tw.com.oscar.vertx;
 
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
+import io.vertx.core.http.HttpServer;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetServerOptions;
 
@@ -46,13 +49,46 @@ public class VertxTest {
         });
 
         NetServerOptions options = new NetServerOptions().setPort(4321);
-        NetServer server = vertx.createNetServer(options);
-        server.listen(1234, "localhost", res -> {
+        NetServer netServer = vertx.createNetServer(options);
+        netServer.listen(1234, "localhost", res -> {
             if (res.succeeded()) {
                 System.out.println("Server is now listening!");
             } else {
                 System.out.println("Failed to bind!");
             }
         });
+
+        // Running blocking code
+        vertx.executeBlocking(future -> {
+            // Call some blocking API that takes a significant amount of time to return
+            String result = "Done"; // someAPI.blockingMethod("hello");
+            future.complete(result);
+        }, res -> {
+            System.out.println("The result is: " + res.result());
+        });
+
+        HttpServer httpServer = vertx.createHttpServer();
+        Future<HttpServer> httpServerFuture = Future.future();
+        // httpServer.listen(httpServerFuture.completer());
+
+        Future<NetServer> netServerFuture = Future.future();
+        // netServer.listen(netServerFuture.completer());
+
+//        CompositeFuture.all(httpServerFuture, netServerFuture).setHandler(ar -> {
+//            if (ar.succeeded()) {
+//                // All server started
+//            } else {
+//                // At least one server failed
+//            }
+//        });
+    }
+
+    static class Server extends AbstractVerticle {
+
+        public void start() {
+            vertx.createHttpServer().requestHandler(req -> req.response()
+                    .putHeader("content-type", "text/plain")
+                    .end("Hello from Vert.x!")).listen(8080);
+        }
     }
 }
