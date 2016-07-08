@@ -10,7 +10,7 @@
  * 2016/3/12 Oscar Wei v1
  * + File created
  */
-package tw.com.oscar.vertx;
+package tw.com.oscar.rx.vertx;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
