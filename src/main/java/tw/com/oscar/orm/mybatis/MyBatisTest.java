@@ -8,11 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tw.com.oscar.guice.GuiceModule;
 import tw.com.oscar.guice.service.MyBatisSessionFactoryService;
-import tw.com.oscar.orm.hibernate.domain.Credit;
-import tw.com.oscar.orm.hibernate.domain.enums.CreditCardType;
+import tw.com.oscar.orm.mybatis.domain.WsSystem;
+import tw.com.oscar.orm.mybatis.mapper.WsSystemMapper;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by oscarwei168 on 2015/6/25.
@@ -26,28 +27,60 @@ public class MyBatisTest {
         String resource = "mybatis-config.xml";
         Injector injector = Guice.createInjector(new GuiceModule());
         MyBatisSessionFactoryService sessionService = injector.getInstance(MyBatisSessionFactoryService.class);
-        SqlSessionFactory sqlMapper = sessionService.getSqlSessionFactory(resource);
+        SqlSessionFactory sessionFactory = sessionService.getSqlSessionFactory(resource);
         SqlSession sqlSession = null;
         try {
             /** Obtain SqlSession object **/
-            sqlSession = sqlMapper.openSession();
-            Credit credit = sqlSession.selectOne("tw.com.oscar.orm.mybatis.mapper.CreditMapper.selectCredit", new
-                    Long(1));
-            logger.info("" + credit);
+            sqlSession = sessionFactory.openSession();
+            WsSystem entity = sqlSession.selectOne("tw.com.oscar.orm.mybatis.mapper.WsSystemMapper.searchWsSystemById",
+                    (long) 1);
+            logger.info("" + entity);
 
-            Credit newCredit = new Credit();
-            newCredit.setName("Master");
-            newCredit.setDescription("Master card");
-            newCredit.setCreditCardType(CreditCardType.MASTER);
-            // return inserted count
-            logger.info("" + sqlSession.insert("tw.com.oscar.orm.mybatis.mapper.CreditMapper.insertCredit", newCredit));
+            /** Obtain Mapper **/
+            WsSystemMapper mapper = sqlSession.getMapper(WsSystemMapper.class);
+            entity = mapper.searchWsSystemById((long) 2);
+            logger.info("" + entity);
+
+            List<WsSystem> allWsSystems = mapper.findAllWsSystem();
+            logger.info("" + allWsSystems.size());
+
+            // allWsSystems = mapper.searchWsSystem(Maps.newHashMap());
+            // logger.info("" + allWsSystems.size());
+
+            WsSystem wsSystem = new WsSystem();
+            wsSystem.setName("Test");
+            wsSystem.setDomain("SYSTEM");
+            wsSystem.setDescription("Test");
+            wsSystem.setDateCreated(new Date());
+            mapper.insertWsSystem(wsSystem);
             sqlSession.commit();
+            Long id = wsSystem.getId();
+            logger.info("" + id);
 
-            Collection<Credit> credits = sqlSession.selectList("tw.com.oscar.orm.mybatis.mapper.CreditMapper" +
-                    ".selectAllCredit");
-            logger.info("" + credits);
+            wsSystem.setDescription("Oscar");
+            wsSystem.setDateLastModified(new Date());
+            int updateRowCount = mapper.updateWsSystem(wsSystem);
+            sqlSession.commit();
+            logger.info("" + updateRowCount);
+            logger.info("" + wsSystem);
 
-            logger.info("" + newCredit.getPid());
+            int deleteRowCount = mapper.deleteWsSystem(id);
+            sqlSession.commit();
+            logger.info("" + deleteRowCount);
+
+//            Credit newCredit = new Credit();
+//            newCredit.setName("Master");
+//            newCredit.setDescription("Master card");
+//            newCredit.setCreditCardType(CreditCardType.MASTER);
+//            // return inserted count
+//            logger.info("" + sqlSession.insert("tw.com.oscar.orm.mybatis.mapper.CreditMapper.insertCredit", newCredit));
+//            sqlSession.commit();
+//
+//            Collection<Credit> credits = sqlSession.selectList("tw.com.oscar.orm.mybatis.mapper.CreditMapper" +
+//                    ".selectAllCredit");
+//            logger.info("" + credits);
+//
+//            logger.info("" + newCredit.getPid());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -55,6 +88,5 @@ public class MyBatisTest {
                 sqlSession.close();
             }
         }
-
     }
 }

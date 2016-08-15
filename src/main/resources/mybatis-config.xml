@@ -29,10 +29,9 @@
         <setting name="proxyFactory" value="CGLIB"/>
     </settings>
 
-
     <typeAliases>
         <typeAlias type="tw.com.oscar.orm.hibernate.domain.Credit" alias="Credit"/>
-        <package name="tw.com.oscar.orm.hibernate.domain"/>
+        <package name="tw.com.oscar.orm.mybatis.domain"/>
     </typeAliases>
 
     <typeHandlers>
@@ -55,11 +54,20 @@
                 <property name="poolTimeToWait" value="20000"/>
             </dataSource>
         </environment>
+
+        <environment id="production">
+            <transactionManager type="MANAGED"/>
+            <dataSource type="JNDI">
+                <property name="data_source" value="java:comp/jdbc/OscarDS"/>
+            </dataSource>
+        </environment>
     </environments>
 
     <mappers>
-        <mapper resource="tw/com/oscar/orm/mybatis/mapper/AccountMapper.xml"/>
-        <mapper resource="tw/com/oscar/orm/mybatis/mapper/CreditMapper.xml"/>
+        <!--<mapper resource="tw/com/oscar/orm/mybatis/mapper/WsSystemMapper.xml"/>-->
+        <!--<mapper resource="tw/com/oscar/orm/mybatis/mapper/AccountMapper.xml"/>-->
+        <!--<mapper resource="tw/com/oscar/orm/mybatis/mapper/CreditMapper.xml"/>-->
+        <package name="tw.com.oscar.orm.mybatis.mapper"/>
     </mappers>
 
 </configuration>

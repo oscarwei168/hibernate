@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="tw.com.oscar.orm.mybatis.mapper.WsSystemMapper">
+    <select id="findAllWsSystem" resultType="WsSystem" resultOrdered="true">
+        SELECT ID, NAME, DOMAIN, DESCRIPTION, DATE_CREATED AS dateCreated, DATE_LAST_MODIFIED AS dateLastModified
+        FROM WS_SYSTEM
+    </select>
+
+    <select id="searchWsSystemById" parameterType="long" resultType="WsSystem">
+        SELECT ID, NAME, DOMAIN, DESCRIPTION, DATE_CREATED AS dateCreated, DATE_LAST_MODIFIED AS dateLastModified
+        FROM WS_SYSTEM
+        WHERE ID = #{id}
+    </select>
+
+    <insert id="insertWsSystem" parameterType="WsSystem"
+            useGeneratedKeys="true" keyProperty="id">
+        <!--<selectKey keyProperty="id" resultType="long" order="BEFORE">-->
+        <!--SELECT WS_SYSTEM_SEQ.NEXTVAL FROM DUAL-->
+        <!--</selectKey>-->
+        INSERT INTO WS_SYSTEM(NAME, DOMAIN, DESCRIPTION, DATE_CREATED)
+        VALUES(#{name}, #{domain}, #{description}, #{dateCreated})
+    </insert>
+
+    <update id="updateWsSystem" parameterType="WsSystem">
+        UPDATE WS_SYSTEM
+        SET NAME = #{name}, DOMAIN = #{domain}, DESCRIPTION = #{description}, DATE_LAST_MODIFIED = #{dateLastModified}
+        WHERE ID = #{id}
+    </update>
+
+    <delete id="deleteWsSystem" parameterType="long">
+        DELETE FROM WS_SYSTEM WHERE ID = #{id}
+    </delete>
+</mapper>
