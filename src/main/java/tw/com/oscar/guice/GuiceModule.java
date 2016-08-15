@@ -13,6 +13,7 @@ package tw.com.oscar.guice;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.Provides;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import org.hibernate.SessionFactory;
@@ -20,6 +21,7 @@ import org.jboss.logging.Logger;
 import tw.com.oscar.guice.service.MyBatisSessionFactoryService;
 import tw.com.oscar.guice.service.impl.MyBatisSessionFactoryServiceImpl;
 
+import java.time.LocalDate;
 import java.util.Random;
 
 /**
@@ -53,6 +55,21 @@ public class GuiceModule extends AbstractModule {
         /** Instances binding **/
         bind(String.class).annotatedWith(Names.named("author")).toInstance("Oscar Wei");
         bind(Integer.class).annotatedWith(Names.named("age")).toInstance(30);
+        /** Untargetted binding **/
+         //bind(LocalDate.class).in(Singleton.class);
+        /** Constructor binding **/
+        /** If LocalDate is 3-party libraries that cannot inject by constructor **/
+        try {
+            // bind(LocalDate.class).toConstructor(LocalDate.class.getConstructor(TimeZone.class));
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
+
+    @Provides
+    public LocalDate localDateProvider() {
+        LocalDate date = LocalDate.now();
+        return date;
     }
 
     /**

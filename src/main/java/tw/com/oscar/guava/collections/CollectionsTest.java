@@ -12,12 +12,18 @@
  */
 package tw.com.oscar.guava.collections;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.collect.*;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * <p>
@@ -51,8 +57,6 @@ public class CollectionsTest {
 
         ImmutableSet<String> colors2 = ImmutableSet.of("RED", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE");
         ImmutableSet<String> colors3 = ImmutableSet.<String>builder().addAll(colors2).add("WHITE").build();
-
-        ImmutableMap<String, Integer> map = ImmutableMap.of("one", 1, "two", 2);
 
         Foo foo = new Foo(Lists.newArrayList());
 
@@ -102,6 +106,52 @@ public class CollectionsTest {
         // Iterators.singletonIterator()
         // Iterators.getNext()
 
+        /** Maps examples **/
+        Map<Integer, String> map1 = Maps.newHashMap();
+        ImmutableMap<String, Integer> map = ImmutableMap.of("one", 1, "two", 2);
+        Map<String, Integer> salary1 = ImmutableMap.<String, Integer>builder()
+                .put("xxx", 1).put("yyy", 2).build();
+        ImmutableSortedMap<String, Integer> salary2 = new ImmutableSortedMap
+                .Builder<String, Integer>(Ordering.natural())
+                .put("xxx", 100).put("yyy", 200).build();
+        assertEquals("xxx", salary2.firstKey());
+        assertEquals(2000, salary2.lastEntry().getValue().intValue());
+        /** Convert list to map **/
+        map1 = Maps.uniqueIndex(colors7, new Function<String, Integer>() {
+
+            @Override
+            public Integer apply(String input) {
+                return input.length();
+            }
+        });
+        /** Convert properties to map **/
+        Properties props = new Properties();
+        props.setProperty("age", "30");
+        Map<String, String> map2 = Maps.fromProperties(props);
+        /** Filter map by entries **/
+        Predicate<Map.Entry<Integer, String>> predicate = new Predicate<Map.Entry<Integer, String>>() {
+            @Override
+            public boolean apply(Map.Entry<Integer, String> input) {
+                return input.getValue().length() > 10;
+            }
+        };
+        Map<Integer, String> midwestStates = Maps.filterEntries(map1, predicate);
+        /** Filter map by keys **/
+        Predicate<Integer> byStateCodeContainsVowelI = new Predicate<Integer>() {
+            @Override
+            public boolean apply(Integer key) {
+                return key > 10;
+            }
+        };
+        Map<Integer, String> stateCodeWithVowelI = Maps.filterKeys(map1, byStateCodeContainsVowelI);
+        /** Filter map by values **/
+        Predicate<String> by15MillionOrGreater = new Predicate<String>() {
+            @Override
+            public boolean apply(String input) {
+                return input.length() >= 15000000;
+            }
+        };
+        Map<Integer, String> populationGT15Million = Maps.filterValues(map1, by15MillionOrGreater);
     }
 
     static class Foo {
