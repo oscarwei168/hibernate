@@ -23,7 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 /**
  * <p>
@@ -111,11 +113,92 @@ public class CollectionsTest {
         ImmutableMap<String, Integer> map = ImmutableMap.of("one", 1, "two", 2);
         Map<String, Integer> salary1 = ImmutableMap.<String, Integer>builder()
                 .put("xxx", 1).put("yyy", 2).build();
+    
+        Map<String, Integer> asMap = Maps.asMap(colors2, new Function<String, Integer>() {
+            @Override
+            public Integer apply(String input) {
+                return input.length();
+            }
+        });
+    
+        /** SortedMap **/
         ImmutableSortedMap<String, Integer> salary2 = new ImmutableSortedMap
                 .Builder<String, Integer>(Ordering.natural())
                 .put("xxx", 100).put("yyy", 200).build();
         assertEquals("xxx", salary2.firstKey());
         assertEquals(2000, salary2.lastEntry().getValue().intValue());
+    
+        /** BiMap **/
+        BiMap<String, Integer> biMap = HashBiMap.create();
+        biMap.put("First", 1);
+        biMap.put("Second", 2);
+        biMap.put("Third", 3);
+        assertEquals(2, biMap.get("Second").intValue());
+        assertEquals("Third", biMap.inverse().get(3));
+    
+        /** Multimap **/
+        Multimap<String, String> multimap = ArrayListMultimap.create();
+        multimap.put("fruit", "apple");
+        multimap.put("fruit", "banana");
+        multimap.put("pet", "cat");
+        multimap.put("pet", "dog");
+        assertThat(multimap.get("fruit"), containsInAnyOrder("apple", "banana"));
+    
+    
+        /** Table **/
+        /** Need more than one key to index a value **/
+        Table<String, String, Integer> distance = HashBasedTable.create();
+        distance.put("London", "Paris", 340);
+        distance.put("New York", "Los Angeles", 3940);
+        distance.put("London", "New York", 5576);
+        assertEquals(3940, distance.get("New York", "Los Angeles").intValue());
+        assertThat(distance.columnKeySet(),
+                containsInAnyOrder("Paris", "New York", "Los Angeles"));
+        assertThat(distance.rowKeySet(), containsInAnyOrder("London", "New York"));
+    
+        Table<String, String, Integer> transposed = Tables.transpose(distance);
+        assertThat(transposed.rowKeySet(),
+                containsInAnyOrder("Paris", "New York", "Los Angeles"));
+        assertThat(transposed.columnKeySet(), containsInAnyOrder("London", "New York"));
+    
+        /** ClassToInstanceMap **/
+        ClassToInstanceMap<Number> numbers = MutableClassToInstanceMap.create();
+        numbers.putInstance(Integer.class, 1);
+        numbers.putInstance(Double.class, 1.5);
+        assertEquals(1, numbers.get(Integer.class));
+        assertEquals(1.5, numbers.get(Double.class));
+    
+        /** Group List using Multimap **/
+        List<String> names = Lists.newArrayList("John", "Adam", "Tom");
+        Function<String, Integer> func = new Function<String, Integer>() {
+            public Integer apply(String input) {
+                return input.length();
+            }
+        };
+        Multimap<Integer, String> groups = Multimaps.index(names, func);
+        assertThat(groups.get(3), containsInAnyOrder("Tom"));
+        assertThat(groups.get(4), containsInAnyOrder("John", "Adam"));
+    
+        Map<String, String> transMap = Maps.transformEntries(map, new Maps.EntryTransformer<String, Integer, String>() {
+        
+            @Override
+            public String transformEntry(String key, Integer value) {
+                return key.toLowerCase() +
+                        "-" + (value * 100); //new value for this key in transformed map
+            }
+        });
+        System.out.println(transMap);
+    
+        transMap =
+                Maps.transformValues(map, new Function<Integer, String>() {
+                
+                    @Override
+                    public String apply(Integer input) {
+                        return "BTC-" + input; //new value in transformed map
+                    }
+                });
+        System.out.println(transMap);
+
         /** Convert list to map **/
         map1 = Maps.uniqueIndex(colors7, new Function<String, Integer>() {
 
@@ -124,10 +207,12 @@ public class CollectionsTest {
                 return input.length();
             }
         });
+    
         /** Convert properties to map **/
         Properties props = new Properties();
         props.setProperty("age", "30");
         Map<String, String> map2 = Maps.fromProperties(props);
+    
         /** Filter map by entries **/
         Predicate<Map.Entry<Integer, String>> predicate = new Predicate<Map.Entry<Integer, String>>() {
             @Override
@@ -136,6 +221,7 @@ public class CollectionsTest {
             }
         };
         Map<Integer, String> midwestStates = Maps.filterEntries(map1, predicate);
+    
         /** Filter map by keys **/
         Predicate<Integer> byStateCodeContainsVowelI = new Predicate<Integer>() {
             @Override
@@ -144,6 +230,7 @@ public class CollectionsTest {
             }
         };
         Map<Integer, String> stateCodeWithVowelI = Maps.filterKeys(map1, byStateCodeContainsVowelI);
+    
         /** Filter map by values **/
         Predicate<String> by15MillionOrGreater = new Predicate<String>() {
             @Override

@@ -15,6 +15,7 @@ package tw.com.oscar.orm.mybatis.mapper;
 import tw.com.oscar.orm.mybatis.domain.WsSystem;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -38,8 +39,8 @@ public interface WsSystemMapper {
     List<WsSystem> findAllWsSystem();
 
     WsSystem searchWsSystemById(Long id);
-
-    // List<WsSystem> searchWsSystem(Map<String, Object> params);
+    
+    List<WsSystem> searchWsSystem(Map<String, Object> params);
 
     void insertWsSystem(WsSystem entity);
 

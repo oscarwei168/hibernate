@@ -18,7 +18,8 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tw.com.oscar.orm.hibernate.domain.*;
+import tw.com.oscar.orm.hibernate.domain.Course;
+import tw.com.oscar.orm.hibernate.domain.Student;
 
 /**
  * <strong>Description:</strong><br>
@@ -36,11 +37,15 @@ public class HibernateUtil {
     private static SessionFactory buildSessionFactory() {
         try {
             return new Configuration().addAnnotatedClass(Course.class)
-                    .addAnnotatedClass(Student.class).addAnnotatedClass(Story.class)
-                    .addAnnotatedClass(StoryItem.class).addAnnotatedClass(Employee.class)
-                    .addAnnotatedClass(Permission.class).addAnnotatedClass(EmployeePermission.class)
+                    .addAnnotatedClass(Student.class)
                     .setInterceptor(new AuditInterceptor()).buildSessionFactory(new
                             StandardServiceRegistryBuilder().build());
+//            return new Configuration().addAnnotatedClass(Course.class)
+//                    .addAnnotatedClass(Student.class).addAnnotatedClass(Story.class)
+//                    .addAnnotatedClass(StoryItem.class).addAnnotatedClass(Employee.class)
+//                    .addAnnotatedClass(Permission.class).addAnnotatedClass(EmployeePermission.class)
+//                    .setInterceptor(new AuditInterceptor()).buildSessionFactory(new
+//                            StandardServiceRegistryBuilder().build());
 
 //            return new Configuration().configure().setInterceptor(new AuditInterceptor())
 //                    .addPackage("tw.com.oscar.orm.hibernate.domain")

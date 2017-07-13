@@ -3,6 +3,16 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="tw.com.oscar.orm.mybatis.mapper.WsSystemMapper">
+
+    <resultMap id="wsSystemResultMap" type="WsSystem">
+        <result property="id" column="ID"/>
+        <result property="name" column="NAME"/>
+        <result property="domain" column="DOMAIN"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="dateCreated" column="DATE_CREATED"/>
+        <result property="dateLastModified" column="DATE_LAST_MODIFIED"/>
+    </resultMap>
+
     <select id="findAllWsSystem" resultType="WsSystem" resultOrdered="true">
         SELECT ID, NAME, DOMAIN, DESCRIPTION, DATE_CREATED AS dateCreated, DATE_LAST_MODIFIED AS dateLastModified
         FROM WS_SYSTEM
@@ -12,6 +22,24 @@
         SELECT ID, NAME, DOMAIN, DESCRIPTION, DATE_CREATED AS dateCreated, DATE_LAST_MODIFIED AS dateLastModified
         FROM WS_SYSTEM
         WHERE ID = #{id}
+    </select>
+
+    <select id="searchWsSystem" parameterType="hashmap" resultType="WsSystem">
+        SELECT ID, NAME, DOMAIN, DESCRIPTION, DATE_CREATED AS dateCreated, DATE_LAST_MODIFIED AS dateLastModified
+        FROM WS_SYSTEM
+        WHERE 1 = 1
+        <if test="name != null">
+            AND NAME LIKE #{name}
+        </if>
+        <if test="dateCreated != null">
+            AND DATE_CREATED >= #{dateCreated}
+        </if>
+        ORDER BY DATE_CREATED DESC
+    </select>
+
+    <select id="callWsSystemById" resultMap="wsSystemResultMap" parameterType="WsSystem"
+            statementType="CALLABLE">
+        {CALL PROC_NAME(#{id}, jdbcType = INTEGER, mode = IN)}
     </select>
 
     <insert id="insertWsSystem" parameterType="WsSystem"
