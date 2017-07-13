@@ -30,8 +30,8 @@ package tw.com.oscar.jdk.thread;
  * @since 2016/2/5
  */
 public class ThreadTest {
-
-    public static void main(String[] args) {
+    
+    public static void main(String[] args) throws InterruptedException {
 
         System.out.println(Thread.currentThread().getName());
 
@@ -48,5 +48,8 @@ public class ThreadTest {
             System.out.println(String.format("Thread '%s' running...", Thread.currentThread().getId()));
         }, "Amy");
         thread2.start();
+        if (Thread.interrupted()) {
+            throw new InterruptedException();
+        }
     }
 }

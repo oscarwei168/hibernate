@@ -1,5 +1,6 @@
 package tw.com.oscar.orm.mybatis;
 
+import com.google.common.collect.Maps;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.apache.ibatis.session.SqlSession;
@@ -14,6 +15,7 @@ import tw.com.oscar.orm.mybatis.mapper.WsSystemMapper;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by oscarwei168 on 2015/6/25.
@@ -43,9 +45,11 @@ public class MyBatisTest {
 
             List<WsSystem> allWsSystems = mapper.findAllWsSystem();
             logger.info("" + allWsSystems.size());
-
-            // allWsSystems = mapper.searchWsSystem(Maps.newHashMap());
-            // logger.info("" + allWsSystems.size());
+    
+            Map<String, Object> param = Maps.newHashMap();
+            param.put("name", "eRMA");
+            allWsSystems = mapper.searchWsSystem(param);
+            logger.info("searchWsSystem size : " + allWsSystems.size());
 
             WsSystem wsSystem = new WsSystem();
             wsSystem.setName("Test");
