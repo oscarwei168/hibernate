@@ -13,6 +13,9 @@
  */
 package tw.com.oscar.orm.hibernate.util;
 
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.Transaction;
 import org.jboss.logging.Logger;
@@ -22,6 +25,7 @@ import tw.com.oscar.orm.hibernate.domain.Role;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * <strong>Description:</strong><br>
@@ -34,7 +38,7 @@ import java.lang.reflect.Type;
 public class AuditInterceptor extends EmptyInterceptor {
 
     private static final Logger LOGGER = Logger.getLogger(AuditInterceptor.class);
-    private int updates;
+    private AtomicInteger updates = new AtomicInteger(0);
     private int creates;
     private int loads;
 
@@ -42,6 +46,8 @@ public class AuditInterceptor extends EmptyInterceptor {
                          Type[] types) {
 
         LOGGER.info("ON DELETE");
+        LOGGER.info(String.format("State: %s", ObjectUtils.toString(state)));
+        LOGGER.info(String.format("Property names: %s", ArrayUtils.toString(propertyNames)));
         // do nothing
     }
 
@@ -50,7 +56,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 
         LOGGER.info("ON FLUSH DIRTY");
         if (entity instanceof Credit) {
-            updates++;
+            updates.incrementAndGet();
             for (int i = 0; i < propertyNames.length; i++) {
                 if ("description".equals(propertyNames[i])) {
                     currentState[i] = "XXXXXXXXXX";
@@ -88,9 +94,9 @@ public class AuditInterceptor extends EmptyInterceptor {
 
     public void afterTransactionCompletion(Transaction tx) {
         if (tx.wasCommitted()) {
-            LOGGER.info("Creations: " + creates + ", Updates: " + updates + ", Loads: " + loads);
+            LOGGER.info("Creations: " + creates + ", Updates: " + updates.get() + ", Loads: " + loads);
         }
-        updates = 0;
+        updates = new AtomicInteger(0);
         creates = 0;
         loads = 0;
     }

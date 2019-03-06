@@ -18,8 +18,8 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tw.com.oscar.orm.hibernate.domain.Course;
-import tw.com.oscar.orm.hibernate.domain.Student;
+import tw.com.oscar.orm.hibernate.domain.SoLine;
+import tw.com.oscar.orm.hibernate.domain.SoOrder;
 
 /**
  * <strong>Description:</strong><br>
@@ -34,12 +34,23 @@ public class HibernateUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtil.class);
     private static final SessionFactory sessionFactory = buildSessionFactory();
 
+    public static SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
+    public static void close() {
+        // Close second-cache/connection pool...
+        sessionFactory.close();
+    }
+
     private static SessionFactory buildSessionFactory() {
         try {
-            return new Configuration().addAnnotatedClass(Course.class)
-                    .addAnnotatedClass(Student.class)
-                    .setInterceptor(new AuditInterceptor()).buildSessionFactory(new
+            return new Configuration().addPackage("tw.com.oscar.orm.hibernate.domain").addAnnotatedClass(SoOrder.class)
+                    .addAnnotatedClass(SoLine.class).setInterceptor(new AuditInterceptor()).buildSessionFactory(new
                             StandardServiceRegistryBuilder().build());
+//            return new Configuration().addAnnotatedClass(SoOrder.class).addAnnotatedClass(SoLine.class)
+//                    .setInterceptor(new AuditInterceptor()).buildSessionFactory(new
+//                            StandardServiceRegistryBuilder().build());
 //            return new Configuration().addAnnotatedClass(Course.class)
 //                    .addAnnotatedClass(Student.class).addAnnotatedClass(Story.class)
 //                    .addAnnotatedClass(StoryItem.class).addAnnotatedClass(Employee.class)
@@ -58,13 +69,9 @@ public class HibernateUtil {
 //                    .buildSessionFactory(
 //                            new StandardServiceRegistryBuilder().build());
         } catch (Throwable ex) {
-            LOGGER.error("Initial SessionFactory creation failed." + ex);
+            LOGGER.error("Initial SessionFactory creation failed: " + ex);
             LOGGER.error(ex.getMessage(), ex);
             throw new ExceptionInInitializerError(ex);
         }
-    }
-
-    public static SessionFactory getSessionFactory() {
-        return sessionFactory;
     }
 }

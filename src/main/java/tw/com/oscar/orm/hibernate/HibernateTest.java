@@ -15,10 +15,10 @@ package tw.com.oscar.orm.hibernate;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.hibernate.*;
+import org.hibernate.proxy.HibernateProxyHelper;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.stat.EntityStatistics;
 import org.hibernate.stat.Statistics;
 import org.jboss.logging.Logger;
 import tw.com.oscar.orm.hibernate.domain.*;
@@ -47,6 +47,7 @@ public class HibernateTest {
 
     private static final Logger LOGGER = Logger.getLogger(HibernateTest.class);
     private static final String ADMIN = "DTS.Admin";
+    // private Session session;
 
     public static void main(String[] args) {
 
@@ -55,50 +56,82 @@ public class HibernateTest {
             statistics = HibernateUtil.getSessionFactory().getStatistics();
             statistics.setStatisticsEnabled(true);
             statistics.clear();
+            statistics.getEntityStatistics(SoOrder.class.getName());
 
-            // Normal insert
-            Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-            Transaction tx = session.beginTransaction();
+            // DO NOT use proxy explicitly
+            HibernateProxyHelper.getClassWithoutInitializingProxy(Account.class);
+
+            // Criteria examples
+            // Session object is not a thread-safe object
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            Query query = session.createSQLQuery("SELECT * FROM SO_ORDER so").addEntity(SoOrder.class);
+            List<SoOrder> soOrderList = query.list();
+            LOGGER.info(String.format("Result counts %s: %s", 1, soOrderList.size()));
+            query = session.createSQLQuery("SELECT PID as pid, ORDER_NUMBER as orderNo FROM SO_ORDER so")
+                    .addScalar("pid").addScalar("orderNo");
+            List<Object[]> soOrderObjs = query.list();
+            LOGGER.info(String.format("Result counts %s: %s", 2, soOrderObjs.size()));
+            soOrderList = (List<SoOrder>) session.createCriteria(SoOrder.class).setFetchMode("soLines",
+                    FetchMode.JOIN).list();
+            LOGGER.info(String.format("Result counts %s: %s", 3, soOrderList.size()));
+            soOrderList = session.createSQLQuery("SELECT {so.*} FROM SO_ORDER so JOIN SO_LINE line ON so.PID = line" +
+                    ".PID_ORDER_SO")
+                    .addEntity("so", SoOrder.class).list();
+            LOGGER.info(String.format("Result counts %s: %s", 4, soOrderList.size()));
+            soOrderObjs = session.createSQLQuery("SELECT so.*, line.* FROM SO_ORDER so, SO_LINE line " +
+                    "WHERE so.PID = line.PID_ORDER_SO").addEntity("so", SoOrder.class).addJoin("line", "so.soLines")
+                    .list();
+            LOGGER.info(String.format("Result counts %s: %s", 5, soOrderObjs.size()));
+            soOrderObjs = session.createSQLQuery("SELECT {so.*}, line.LINE_NUMBER AS lineNumber FROM SO_ORDER so JOIN SO_LINE line " +
+                    "ON so.PID = line.PID_ORDER_SO").addEntity
+                    ("so", SoOrder.class).addScalar("lineNumber").list();
+            LOGGER.info(String.format("Result counts %s: %s", 6, soOrderObjs.size()));
+            session.close();
+            LOGGER.info(String.format("SoOrder load counts: %s", statistics.getEntityLoadCount()));
+
+//            // Normal insert
+//            Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+//            Transaction tx = session.beginTransaction();
 //            Long pid = testCase1(session);
-            tx.commit();
-            EntityStatistics roleStatic = statistics.getEntityStatistics(Role.class.getName());
-            LOGGER.info("InsertCount : " + roleStatic.getInsertCount());
-            statistics.clear();
-
-            // Dynamic insert/update testing
-            session = HibernateUtil.getSessionFactory().getCurrentSession();
-            tx = session.beginTransaction();
+//            tx.commit();
+//            EntityStatistics roleStatic = statistics.getEntityStatistics(Role.class.getName());
+//            LOGGER.info("InsertCount : " + roleStatic.getInsertCount());
+//            statistics.clear();
+//
+//            // Dynamic insert/update testing
+//            session = HibernateUtil.getSessionFactory().getCurrentSession();
+//            tx = session.beginTransaction();
 //            Role role = testCase2(session, pid);
-            tx.commit();
-            LOGGER.info("UpdateCount : " + roleStatic.getUpdateCount());
-            statistics.clear();
-
-            // same-session cache testing
-            session = HibernateUtil.getSessionFactory().getCurrentSession();
+//            tx.commit();
+//            LOGGER.info("UpdateCount : " + roleStatic.getUpdateCount());
+//            statistics.clear();
+//
+//            // same-session cache testing
+//            session = HibernateUtil.getSessionFactory().getCurrentSession();
 //            HibernateUtil.getSessionFactory().getCache().evictEntity(Role.class, pid);
-            tx = session.beginTransaction();
+//            tx = session.beginTransaction();
 //            session.setCacheMode(CacheMode.PUT);
 //            List<Role> roles = testCache1(session, pid); // comment class-level cache setting
-            tx.commit();
-            statistics.clear();
-
-            // cross-session cache testing
-            session = HibernateUtil.getSessionFactory().getCurrentSession();
-            tx = session.beginTransaction();
+//            tx.commit();
+//            statistics.clear();
+//
+//            // cross-session cache testing
+//            session = HibernateUtil.getSessionFactory().getCurrentSession();
+//            tx = session.beginTransaction();
 //            HibernateUtil.getSessionFactory().getCache().evictEntity(Role.class, pid);
 //            session.setCacheMode(CacheMode.NORMAL); // default cache mode
 //            Role role3 = testCache2(session, pid); // uncomment class-level cache setting
-            tx.commit();
-            statistics.clear();
-
+//            tx.commit();
+//            statistics.clear();
+//
 //            boolean isContain = roles.contains(role3);
 //            assert isContain : "WRONG REFERENCE???";
-
-            // update() and merge() examples
+//
+//            // update() and merge() examples
 //            role3.setDescription("Xxxxx"); // state?
-
-            session = HibernateUtil.getSessionFactory().getCurrentSession();
-            tx = session.beginTransaction();
+//
+//            session = HibernateUtil.getSessionFactory().getCurrentSession();
+//            tx = session.beginTransaction();
 //            Role role4 = testCache2(session, pid);
 //            role4.setDescription("Yyyyyy");
 //            session.update(role3);
@@ -111,61 +144,61 @@ public class HibernateTest {
 //            LOGGER.info(session.contains(role3));
 //            tx.commit();
 //            statistics.clear();
-            // Composition-id searching
+//            // Composition-id searching
 //            session = HibernateUtil.getSessionFactory().getCurrentSession();
 //            tx = session.beginTransaction();
 //            CompanyId companyId = new CompanyId("EMEA", "0001");
 //            Company company = (Company) session.get(Company.class, companyId);
 //            LOGGER.info("Desc : " + company.getDescription());
-            tx.commit();
-//            statistics.clear();
-
-            session = HibernateUtil.getSessionFactory().getCurrentSession();
-            tx = session.beginTransaction();
-            Credit credit = createCredit(session);
-//            session.delete(role); // TODO
-            tx.commit();
-            statistics.clear();
-
-            // Persisting example
-            session = HibernateUtil.getSessionFactory().getCurrentSession();
-            tx = session.beginTransaction();
-//            testCase3(session, credit);
-            tx.commit();
-            statistics.clear();
-
-            session = HibernateUtil.getSessionFactory().getCurrentSession();
-            tx = session.beginTransaction();
-//            accountSummary(session);
-            tx.commit();
-            statistics.clear();
-
-            session = HibernateUtil.getSessionFactory().getCurrentSession();
-            tx = session.beginTransaction();
-//            formula(session);
-            tx.commit();
-            statistics.clear();
-
-            // Named-query example
-            session = HibernateUtil.getSessionFactory().getCurrentSession();
-            tx = session.beginTransaction();
-//            testCase4(session);
-            tx.commit();
-            statistics.clear();
-
-            // Natural-Id searching example
-            session = HibernateUtil.getSessionFactory().getCurrentSession();
-            tx = session.beginTransaction();
-//            testNaturalId(session);
-            tx.commit();
-            statistics.clear();
-
-            // Full-Text searching example
-            session = HibernateUtil.getSessionFactory().getCurrentSession();
-            tx = session.beginTransaction();
-            testFullText(session);
 //            tx.commit();
-            statistics.clear();
+//            statistics.clear();
+//
+//            session = HibernateUtil.getSessionFactory().getCurrentSession();
+//            tx = session.beginTransaction();
+//            Credit credit = createCredit(session);
+//            session.delete(role); // TODO
+//            tx.commit();
+//            statistics.clear();
+//
+//            // Persisting example
+//            session = HibernateUtil.getSessionFactory().getCurrentSession();
+//            tx = session.beginTransaction();
+//            testCase3(session, credit);
+//            tx.commit();
+//            statistics.clear();
+//
+//            session = HibernateUtil.getSessionFactory().getCurrentSession();
+//            tx = session.beginTransaction();
+//            accountSummary(session);
+//            tx.commit();
+//            statistics.clear();
+//
+//            session = HibernateUtil.getSessionFactory().getCurrentSession();
+//            tx = session.beginTransaction();
+//            formula(session);
+//            tx.commit();
+//            statistics.clear();
+//
+//            // Named-query example
+//            session = HibernateUtil.getSessionFactory().getCurrentSession();
+//            tx = session.beginTransaction();
+//            testCase4(session);
+//            tx.commit();
+//            statistics.clear();
+//
+//            // Natural-Id searching example
+//            session = HibernateUtil.getSessionFactory().getCurrentSession();
+//            tx = session.beginTransaction();
+//            testNaturalId(session);
+//            tx.commit();
+//            statistics.clear();
+//
+//            // Full-Text searching example
+//            session = HibernateUtil.getSessionFactory().getCurrentSession();
+//            tx = session.beginTransaction();
+//            testFullText(session);
+//            tx.commit();
+//            statistics.clear();
 
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -173,7 +206,7 @@ public class HibernateTest {
             if (null != statistics) {
                 statistics.setStatisticsEnabled(false);
             }
-//            HibernateUtil.getSessionFactory().close();
+            HibernateUtil.getSessionFactory().close();
             LOGGER.info("Hibernate session is closed");
         }
 
@@ -368,8 +401,8 @@ public class HibernateTest {
     }
 
     private static void accountSummary(Session session) {
-        Query query = session.createQuery("FROM AccountSummary");
-        List<AccountSummary> list = query.list();
-        list.stream().forEach(summary -> System.out.println(summary.getFirstName() + " : " + summary.getSalary()));
+//        Query query = session.createQuery("FROM AccountSummary");
+//        List<AccountSummary> list = query.list();
+//        list.stream().forEach(summary -> System.out.println(summary.getFirstName() + " : " + summary.getSalary()));
     }
 }

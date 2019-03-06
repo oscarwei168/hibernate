@@ -47,7 +47,10 @@
 		<property name="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</property>
 		<property name="hibernate.cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
 		-->
-		
+
+		<mapping class="tw.com.oscar.orm.hibernate.domain.SoOrder" />
+		<mapping class="tw.com.oscar.orm.hibernate.domain.SoLine" />
+
 		<!--<mapping resource="tw/com/oscar/orm/hibernate/domain/Address.hbm.xml" />-->
 		<!--<mapping resource="tw/com/oscar/orm/hibernate/domain/Children.hbm.xml" />-->
 		<!--<mapping resource="tw/com/oscar/orm/hibernate/domain/Classroom.hbm.xml" />-->
